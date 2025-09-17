@@ -1,0 +1,28 @@
+data:
+  raw: Data/raw/  
+  processed: Data/processed
+  preprocessed: "Data/processed/data_segments_combined.npz" # Combined preprocessed data from all subjects
+  memd: "Data/processed/data_segments_MEMD_filtered.npz" # Combined MEMD filtered data from all subjects
+
+model:
+  output_dir: trained_models
+  detector_type: linreg
+
+Output:
+  correlation_matrix: Output/correlation_matrix
+  eval: Output/eval
+
+#Extracted from file DreamCatcher/DEV/Greedy_algorithm/top2.ipynb from Adin Belsics masters
+channels:
+  top_64: [1, 6, 8, 9, 43, 44, 61, 65, 66, 67, 79, 82, 91, 92, 93, 94, 101, 102, 103, 110, 111, 119, 121, 125, 135, 144, 145, 146, 155, 156, 165, 175, 185, 187, 189, 194, 199, 203, 207, 208, 209, 210, 216, 218, 219, 221, 228, 229, 231, 232, 233, 234, 235, 236, 237, 240, 244, 246, 248, 249, 250, 251, 255, 256]
+
+  top_40: [6, 8, 9, 44, 61, 65, 66, 79, 92, 93, 94, 102, 103, 110, 111, 119, 121, 144, 155, 185, 199, 203, 207, 208, 209, 216, 218, 219, 221, 228, 229, 232, 233, 237, 240, 246, 248, 250, 251, 256]
+
+  top_30: [6, 8, 44, 61, 65, 66, 79, 92, 93, 102, 103, 111, 121, 144, 155, 185, 199, 208, 216, 218, 219, 228, 229, 232, 233, 237, 248, 250, 251, 256]
+
+  top_20: [6, 8, 44, 66, 79, 102, 103, 111, 144, 155, 199, 208, 219, 229, 232, 233, 237, 248, 251, 256]
+
+memd_params:
+  num_directions: 512 # can try 64 as found in file job2_5 file from Adin Belsics masters
+  stop_criteria: "stop"
+  stop_args: [0.075, 0.75, 0.075]
