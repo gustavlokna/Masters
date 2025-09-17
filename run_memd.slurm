@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --account=ie-idi
 #SBATCH --job-name=memd_job
-#SBATCH --time=00:02:00
+#SBATCH --time=00:00:15
 
 #SBATCH --partition=GPUQ
 #SBATCH --gres=gpu:1
