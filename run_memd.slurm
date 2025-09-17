@@ -7,8 +7,8 @@
 #SBATCH --gres=gpu:1
 #SBATCH --mem=16G
 #SBATCH --nodes=1
-#SBATCH --output=output.txt      # Specifying 'stdout'
-#SBATCH --error=output.err        # Specifying 'stderr'
+#SBATCH --output=memd_out.txt         # ✅ Output file
+#SBATCH --error=memd_err.txt          # ✅ Error file
 
 #SBATCH --mail-user=gustal@stud.ntnu.no
 #SBATCH --mail-type=ALL
@@ -21,5 +21,5 @@ echo "ID of job: $SLURM_JOB_ID"
 echo "The job was run on these nodes: $SLURM_JOB_NODELIST"
 
 module purge
-module load Anaconda/2020.07
+module load Anaconda3/2023.09-0
 python src/main.py memd

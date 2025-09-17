@@ -1,0 +1,7 @@
+numpy
+pandas
+scipy
+pyyaml
+mne
+scikit-learn
+torch
