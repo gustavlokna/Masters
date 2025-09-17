@@ -40,9 +40,9 @@ def main(args: argparse.Namespace) -> None:
         preprocessing(config)
         print("completed data preprocessing")
     elif args.memd:
-        apply_memd_pipeline(config)
+        #apply_memd_pipeline(config)
         
-        print("hallo")
+        print("running memd")
     elif args.train:
         print("hei")
         #train_model(config)
