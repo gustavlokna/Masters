@@ -3,7 +3,7 @@ from typing import Any
 from utilities.config import read_config
 from datapreprocessing.preprocessing import preprocessing
 from datapreprocessing.memd_filtering import apply_memd_pipeline
-
+from datapreprocessing.psd_filtering import apply_psd_pipeline
 
 def main(args: argparse.Namespace) -> None:
     """
@@ -43,7 +43,8 @@ def main(args: argparse.Namespace) -> None:
         #apply_memd_pipeline(config)
         
         print("running memd")
-    elif args.train:
+    elif args.psd:
+        apply_psd_pipeline(config)
         print("hei")
         #train_model(config)
 

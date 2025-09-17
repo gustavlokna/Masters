@@ -22,4 +22,9 @@ echo "The job was run on these nodes: $SLURM_JOB_NODELIST"
 
 module purge
 module load Anaconda3/2023.09-0
+
+# ✅ Activate your conda env
+source ~/.bashrc
+conda activate dream_env
+
 python src/main.py memd
