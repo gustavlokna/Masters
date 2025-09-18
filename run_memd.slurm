@@ -3,9 +3,9 @@
 #SBATCH --job-name=memd_job
 #SBATCH --time=00:05:00
 
-#SBATCH --partition=GPUQ
-#SBATCH --gres=gpu:1
-#SBATCH --mem=16G
+#SBATCH --partition=CPUQ
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=32G
 #SBATCH --nodes=1
 #SBATCH --output=memd_out.txt         # ✅ Output file
 #SBATCH --error=memd_err.txt          # ✅ Error file
@@ -27,4 +27,4 @@ module load Anaconda3/2023.09-0
 source ~/.bashrc
 conda activate dream_env
 
-python src/main.py --memd
+python -u src/main.py --memd

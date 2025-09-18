@@ -1,7 +1,7 @@
 import numpy as np
 import os
+from multiprocessing import Pool
 from utilities.memd import memd
-
 
 
 def load_data(npz_path):
@@ -12,10 +12,7 @@ def load_data(npz_path):
 
 
 def memd_filter_segment(segment, memd_params):
-    # segment: (512, 20)
-    print("hei")
     segment_T = segment.T  # (20, 512)
-
     imfs = memd(segment_T,
                 memd_params["num_directions"],
                 memd_params["stop_criteria"],
@@ -25,13 +22,9 @@ def memd_filter_segment(segment, memd_params):
 
 
 def apply_memd_filter(X, memd_params):
-    filtered_segments = []
-    for i, segment in enumerate(X):
-        #if i % 100 == 0:
-        print(f"Filtering segment {i}/{len(X)}")
-        filtered = memd_filter_segment(segment, memd_params)
-        filtered_segments.append(filtered)
-    return np.stack(filtered_segments)
+    with Pool(processes=os.cpu_count()) as pool:
+        results = pool.starmap(memd_filter_segment, [(segment, memd_params) for segment in X])
+    return np.stack(results)
 
 
 def save_filtered_data(output_path, X_filtered, y, subject):
