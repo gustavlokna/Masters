@@ -27,8 +27,8 @@ def memd_filter_segment(segment, memd_params):
 def apply_memd_filter(X, memd_params):
     filtered_segments = []
     for i, segment in enumerate(X):
-        if i % 100 == 0:
-            print(f"Filtering segment {i}/{len(X)}")
+        #if i % 100 == 0:
+        print(f"Filtering segment {i}/{len(X)}")
         filtered = memd_filter_segment(segment, memd_params)
         filtered_segments.append(filtered)
     return np.stack(filtered_segments)
