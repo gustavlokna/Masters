@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --account=ie-idi
 #SBATCH --job-name=memd_job
-#SBATCH --time=00:05:00
+#SBATCH --time=24:00:00
 
 #SBATCH --partition=CPUQ
 #SBATCH --cpus-per-task=16
