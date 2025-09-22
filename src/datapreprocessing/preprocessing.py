@@ -89,8 +89,7 @@ def preprocessing(config: dict) -> None:
             # Get experience label
             meta = records_df[records_df["Filename"] == fname]
             if meta.empty:
-                print("ERROR") # TODO some error catching ? 
-                continue  # skip file if no metadata
+                raise RuntimeError(f"❌ No metadata found for file: {fname}")
             label = meta.iloc[0]["Experience"]
             y = np.full((num_segments,), label)
 

@@ -1,7 +1,7 @@
 import numpy as np
 import os
+from multiprocessing import Pool
 from utilities.memd import memd
-
 
 
 def load_data(npz_path):
@@ -11,27 +11,21 @@ def load_data(npz_path):
     return X, y, subject
 
 
-def memd_filter_segment(segment, memd_params):
-    # segment: (512, 20)
-    print("hei")
-    segment_T = segment.T  # (20, 512)
-
+def memd_filter_segment_args(args):
+    segment, memd_params = args
+    segment_T = segment.T  # (channels, samples)
     imfs = memd(segment_T,
                 memd_params["num_directions"],
                 memd_params["stop_criteria"],
-                memd_params["stop_args"])
-    reconstructed = np.sum(imfs, axis=0)  # (20, 512)
-    return reconstructed.T  # (512, 20)
+                memd_params["stop_args"])  # (n_imfs, channels, samples)
+    return imfs.transpose(0, 2, 1)  # → (n_imfs, samples, channels)
 
 
 def apply_memd_filter(X, memd_params):
-    filtered_segments = []
-    for i, segment in enumerate(X):
-        #if i % 100 == 0:
-        print(f"Filtering segment {i}/{len(X)}")
-        filtered = memd_filter_segment(segment, memd_params)
-        filtered_segments.append(filtered)
-    return np.stack(filtered_segments)
+    with Pool(processes=os.cpu_count()) as pool:
+        args = [(segment, memd_params) for segment in X]
+        results = pool.map(memd_filter_segment_args, args)
+    return np.stack(results)  # shape: (n_segments, n_imfs, 512, 20)
 
 
 def save_filtered_data(output_path, X_filtered, y, subject):

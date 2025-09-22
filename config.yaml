@@ -2,7 +2,7 @@ data:
   raw: Data/raw/  
   processed: Data/processed
   preprocessed: "Data/processed/data_segments_combined.npz" # Combined preprocessed data from all subjects
-  memd: "Data/processed/data_segments_MEMD_filtered.npz" # Combined MEMD filtered data from all subjects
+  memd: "Data/processed/data_segments_MEMD_paralell_filtered.npz" # Combined MEMD filtered data from all subjects
   psd: Data/processed/data_segments_PSD_features.npz # Combined PSD features from all subjects
 
 model:
