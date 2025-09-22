@@ -24,7 +24,7 @@ channels:
   top_20: [6, 8, 44, 66, 79, 102, 103, 111, 144, 155, 199, 208, 219, 229, 232, 233, 237, 248, 251, 256]
 
 memd_params:
-  num_directions: 64 # can try 64 as found in file job2_5 file from Adin Belsics masters
+  num_directions: 512 # can try 64 as found in file job2_5 file from Adin Belsics masters
   stop_criteria: "stop"
   stop_args: [0.075, 0.75, 0.075]
 

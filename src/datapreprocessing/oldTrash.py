@@ -93,7 +93,8 @@ def preprocessing(config: dict) -> None:
     print("starting preprocess")
     fs_target = 256
     crop_tmax = 119.998 # As time is zero indexed this corps the 120 first seconds
-    segment_len = int(2 * fs_target)  # 512 samples
+    epoch = 2 #TODO set as 2.5 seconds
+    segment_len = int(epoch * fs_target)  # 512 samples
 
     all_X = []
     all_y = []
