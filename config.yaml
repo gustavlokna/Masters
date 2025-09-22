@@ -2,7 +2,7 @@ data:
   raw: Data/raw/  
   processed: Data/processed
   preprocessed: "Data/processed/data_segments_combined.npz" # Combined preprocessed data from all subjects
-  memd: "Data/processed/data_segments_MEMD_filtered_22_16_dir_sep.npz" # Combined MEMD filtered data from all subjects
+  memd: "Data/processed/data_segments_MEMD_filtered_22_64_dir_sep.npz" # Combined MEMD filtered data from all subjects
   psd: Data/processed/data_segments_PSD_features.npz # Combined PSD features from all subjects
 
 model:
@@ -24,7 +24,7 @@ channels:
   top_20: [6, 8, 44, 66, 79, 102, 103, 111, 144, 155, 199, 208, 219, 229, 232, 233, 237, 248, 251, 256]
 
 memd_params:
-  num_directions: 16 # can try 64 or 512 as found in file job2_5 file from Adian Belsics masters
+  num_directions: 64 # can try 64 or 512 as found in file job2_5 file from Adian Belsics masters
   stop_criteria: "stop"
   stop_args: [0.075, 0.75, 0.075]
   keep_imfs: 4   # new param

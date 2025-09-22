@@ -4,6 +4,7 @@ from utilities.config import read_config
 from datapreprocessing.preprocessing import preprocessing
 from datapreprocessing.memd_filtering import apply_memd_pipeline
 from datapreprocessing.psd_filtering import apply_psd_pipeline
+from datapreprocessing.oldTrash import test_memd_on_segment
 
 def main(args: argparse.Namespace) -> None:
     """
@@ -48,6 +49,10 @@ def main(args: argparse.Namespace) -> None:
     elif args.psd:
         print("running psd feature extraction")
         apply_psd_pipeline(config)
+    
+    elif args.dev: 
+        imfs = test_memd_on_segment("Data/processed/data_segments_combined.npz", num_directions=64)
+        print("IMFs shape:", imfs.shape)
         
     else:
         print("No valid arguments provided. Use --help for usage information.")
@@ -81,6 +86,11 @@ def parse_arguments() -> argparse.Namespace:
         "--psd",
         action="store_true",
         help="Enable psd feature extraction on memd filtered data",
+    )
+    parser.add_argument(
+        "--dev",
+        action="store_true",
+        help="Enable development/testing mode",
     )
     return parser.parse_args()
 
