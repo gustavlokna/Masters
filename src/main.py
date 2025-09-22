@@ -41,6 +41,7 @@ def main(args: argparse.Namespace) -> None:
         print("completed data preprocessing")
     elif args.memd:
         print("running memd filtering")
+
         apply_memd_pipeline(config)
         
         print("running memd")
