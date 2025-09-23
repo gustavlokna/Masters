@@ -36,11 +36,11 @@ def apply_psd_pipeline(config: dict) -> None:
 
     bands = config["psd_bands"]  # Read from config
 
-    # Load MEMD data: shape (n_segments, n_imfs, 512, 20)
+    # Load MEMD data: shape (n_segments, n_imfs, 640, 20)
     X, y, subject = load_data(input_path)
 
     # Reconstruct signal from IMF1–4: sum over axis=1 (IMFs)
-    X_reconstructed = X[:, :4, :, :].sum(axis=1)  # shape: (n_segments, 512, 20)
+    X_reconstructed = X[:, :4, :, :].sum(axis=1)  # shape: (n_segments, 640, 20)
 
     # Compute PSD features
     X_psd = compute_psd_features(X_reconstructed, bands)

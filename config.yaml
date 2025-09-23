@@ -1,8 +1,8 @@
 data:
   raw: Data/raw/  
   processed: Data/processed
-  preprocessed: "Data/processed/data_segments_combined.npz" # Combined preprocessed data from all subjects
-  memd: "Data/processed/data_segments_MEMD_filtered_22_512_dir_sep.npz" # Combined MEMD filtered data from all subjects
+  preprocessed: "Data/processed/data_segments_combined_2_5secondepoch.npz" # Combined preprocessed data from all subjects
+  memd: "Data/processed/data_segments_MEMD_filtered_23_512_dir_sep.npz" # Combined MEMD filtered data from all subjects
   psd: Data/processed/data_segments_PSD_features.npz # Combined PSD features from all subjects
 
 model:

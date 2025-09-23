@@ -33,7 +33,7 @@ def apply_memd_filter(X, memd_params):
     with Pool(processes=os.cpu_count()) as pool:
         args = [(segment, memd_params, i, len(X), keep_imfs) for i, segment in enumerate(X)]
         results = pool.map(memd_filter_segment_args, args)
-    return np.stack(results)  # shape: (n_segments, n_imfs, 512, 20)
+    return np.stack(results)  # shape: (n_segments, n_imfs, 640, 20)
 
 
 def save_filtered_data(output_path, X_filtered, y, subject):
