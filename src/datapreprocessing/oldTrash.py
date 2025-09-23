@@ -185,7 +185,7 @@ def preprocessing(config: dict) -> None:
 
 
 
-def test_memd_on_segment(npz_path, segment_index=1752, num_directions=16, stop_criteria="stop", stop_args=[0.075, 0.75, 0.075]):
+def test_memd_on_segment(npz_path, segment_index=1103, num_directions=16, stop_criteria="stop", stop_args=[0.075, 0.75, 0.075]):
     from utilities.memd import memd  # import here to avoid errors if unused
     import numpy as np
 

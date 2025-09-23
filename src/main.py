@@ -69,7 +69,7 @@ def parse_arguments() -> argparse.Namespace:
     Notes
     -----
     This function sets up the argument parser with the following options:
-    --preprocess : Flag to enable preprocessing of sensor and HVAC data.
+    --preprocess : Flag to enable preprocessing of raw EEG data.
     """
     parser = argparse.ArgumentParser(description="Sensor anomaly detection pipeline")
     parser.add_argument(
