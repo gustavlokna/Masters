@@ -12,18 +12,12 @@ def load_data(npz_path):
 
 
 def memd_filter_segment_args(args):
-    segment, memd_params, idx, total, keep_imfs = args
+    segment, memd_params = args
     segment_T = segment.T  # (channels, samples)
     imfs = memd(segment_T,
                 memd_params["num_directions"],
                 memd_params["stop_criteria"],
                 memd_params["stop_args"])  # (n_imfs, channels, samples)
-
-    if imfs.shape[0] < keep_imfs:
-        raise ValueError(f"[{idx+1}/{total}] Segment has only {imfs.shape[0]} IMFs, but {keep_imfs} requested")
-
-    imfs = imfs[:keep_imfs]
-    #print(f"[{idx+1}/{total}] IMFs shape after slicing: {imfs.shape}", flush=True)
     return imfs.transpose(0, 2, 1)  # → (n_imfs, samples, channels)
 
 
@@ -49,16 +43,14 @@ def apply_memd_filter(X, memd_params):
 """
 def apply_memd_filter(X, memd_params):
     all_imfs = []
-
-    max_imfs = 0
     tmp_results = []
+    max_imfs = 0
 
     # First pass: compute IMFs per segment
-    for i, segment in enumerate(X):
-        imfs = memd_filter_segment_args((segment, memd_params, i, len(X), keep_imfs if keep_imfs else 10**9))
+    for _, segment in enumerate(X):
+        imfs = memd_filter_segment_args((segment, memd_params))
         tmp_results.append(imfs)
         max_imfs = max(max_imfs, imfs.shape[0])
-
 
     # Second pass: pad to max_imfs
     for imfs in tmp_results:
@@ -67,10 +59,11 @@ def apply_memd_filter(X, memd_params):
             pad_shape = (max_imfs - n_imfs, samples, channels)
             imfs = np.concatenate([imfs, np.zeros(pad_shape, dtype=imfs.dtype)], axis=0)
         else:
-            imfs = imfs[:max_imfs]  # in case too many
+            imfs = imfs[:max_imfs]
         all_imfs.append(imfs)
 
     return np.stack(all_imfs)  # (n_segments, max_imfs, samples, channels)
+
 
 
 
