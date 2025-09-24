@@ -12,20 +12,28 @@ def load_data(npz_path):
 
 
 def memd_filter_segment_args(args):
-    segment, memd_params = args
+    segment, memd_params, idx, total, keep_imfs = args
     segment_T = segment.T  # (channels, samples)
     imfs = memd(segment_T,
                 memd_params["num_directions"],
                 memd_params["stop_criteria"],
                 memd_params["stop_args"])  # (n_imfs, channels, samples)
+
+    if imfs.shape[0] < keep_imfs:
+        raise ValueError(f"[{idx+1}/{total}] Segment has only {imfs.shape[0]} IMFs, but {keep_imfs} requested")
+
+    imfs = imfs[:keep_imfs]
+    #print(f"[{idx+1}/{total}] IMFs shape after slicing: {imfs.shape}", flush=True)
     return imfs.transpose(0, 2, 1)  # → (n_imfs, samples, channels)
 
 
+
 def apply_memd_filter(X, memd_params):
+    keep_imfs = memd_params["keep_imfs"]
     with Pool(processes=os.cpu_count()) as pool:
-        args = [(segment, memd_params) for segment in X]
+        args = [(segment, memd_params, i, len(X), keep_imfs) for i, segment in enumerate(X)]
         results = pool.map(memd_filter_segment_args, args)
-    return np.stack(results)  # shape: (n_segments, n_imfs, 512, 20)
+    return np.stack(results)  # shape: (n_segments, n_imfs, 640, 20)
 
 
 def save_filtered_data(output_path, X_filtered, y, subject):

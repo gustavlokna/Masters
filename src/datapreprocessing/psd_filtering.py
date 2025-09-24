@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.signal import welch
 
+
 def load_data(npz_path):
     data = np.load(npz_path)
     X, y, subject = data["X"], data["y"], data["subject"]
@@ -31,13 +32,18 @@ def compute_psd_features(X, bands, fs=256):
 
 def apply_psd_pipeline(config: dict) -> None:
     input_path = config["data"]["memd"]
-    output_path = config["data"].get("psd", "Data/processed/data_segments_PSD_features.npz")
+    output_path = config["data"]["psd"]
 
     bands = config["psd_bands"]  # Read from config
 
-    # Convert string keys to tuple values if needed
-    bands = {k: tuple(v) for k, v in bands.items()}
-
+    # Load MEMD data: shape (n_segments, n_imfs, 640, 20)
     X, y, subject = load_data(input_path)
-    X_psd = compute_psd_features(X, bands)
+
+    # Reconstruct signal from IMF1–4: sum over axis=1 (IMFs)
+    X_reconstructed = X[:, :4, :, :].sum(axis=1)  # shape: (n_segments, 640, 20)
+
+    # Compute PSD features
+    X_psd = compute_psd_features(X_reconstructed, bands)
+
+    # Save features
     save_psd_data(output_path, X_psd, y, subject)

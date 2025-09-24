@@ -8,7 +8,8 @@ def preprocessing(config: dict) -> None:
     print("starting preprocess")
     fs_target = 256
     crop_tmax = 119.998 # As time is zero indexed this corps the 120 first seconds
-    segment_len = int(2 * fs_target)  # 512 samples
+    epoch_length = 2.5 # seconds
+    segment_len = int(epoch_length * fs_target)  # 640 samples
 
     all_X = []
     all_y = []
@@ -75,9 +76,9 @@ def preprocessing(config: dict) -> None:
 
 
             # Segment continuous EEG data into non-overlapping 2-second windows
-            # Each segment contains 512 samples (2s × 256Hz), across 20 selected channels
-            # Final shape: (num_segments, 512, 20) suitable for 3D ML input (e.g., CNN/RNN)
-            # Segment into 2s (512 samples)
+            # Each segment contains 640 samples (2.5s × 256Hz), across 20 selected channels
+            # Final shape: (num_segments, 640, 20) suitable for 3D ML input (e.g., CNN/RNN)
+            # Segment into 2.5s (640 samples)
             num_segments = df.shape[0] // segment_len
             print(f"number of segments {num_segments}")
 
@@ -106,7 +107,7 @@ def preprocessing(config: dict) -> None:
     X_all = np.concatenate(all_X, axis=0)
     y_all = np.concatenate(all_y, axis=0)
 
-    outpath = os.path.join(config["data"]["processed"], f"data_segments_combined.npz")
+    outpath = os.path.join(config["data"]["processed"], f"data_segments_combined_2_5secondepoch.npz")
 
     np.savez(
     outpath,

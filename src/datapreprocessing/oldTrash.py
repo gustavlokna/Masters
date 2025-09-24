@@ -182,3 +182,22 @@ def preprocessing(config: dict) -> None:
 
     with np.load(outpath) as data:
         print("Loaded .npz shape:", data["X"].shape, data["y"].shape)
+
+
+
+def test_memd_on_segment(npz_path, segment_index=1103, num_directions=16, stop_criteria="stop", stop_args=[0.075, 0.75, 0.075]):
+    from utilities.memd import memd  # import here to avoid errors if unused
+    import numpy as np
+
+    # Load data
+    data = np.load(npz_path)
+    X = data["X"]
+    print(f"Loaded data shape: {X.shape}")
+    
+    segment = X[segment_index].T  # (20, 512)
+
+    # Run MEMD
+    imfs = memd(segment, num_directions, stop_criteria, stop_args)
+    print(f"Segment {segment_index} → IMFs shape: {imfs.shape}")  # (n_imfs, 20, 512)
+    
+    return imfs

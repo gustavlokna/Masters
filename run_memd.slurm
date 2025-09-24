@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --account=ie-idi
 #SBATCH --job-name=memd_job
-#SBATCH --time=24:00:00
+#SBATCH --time=30:00:00
 
 #SBATCH --partition=CPUQ
 #SBATCH --cpus-per-task=16
@@ -27,4 +27,4 @@ module load Anaconda3/2023.09-0
 source ~/.bashrc
 conda activate dream_env
 
-python -u src/main.py --memd
+python src/main.py --memd

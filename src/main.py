@@ -4,6 +4,7 @@ from utilities.config import read_config
 from datapreprocessing.preprocessing import preprocessing
 from datapreprocessing.memd_filtering import apply_memd_pipeline
 from datapreprocessing.psd_filtering import apply_psd_pipeline
+from datapreprocessing.oldTrash import test_memd_on_segment
 
 def main(args: argparse.Namespace) -> None:
     """
@@ -40,24 +41,19 @@ def main(args: argparse.Namespace) -> None:
         preprocessing(config)
         print("completed data preprocessing")
     elif args.memd:
+        print("running memd filtering")
+
         apply_memd_pipeline(config)
         
         print("running memd")
     elif args.psd:
+        print("running psd feature extraction")
         apply_psd_pipeline(config)
-        print("hei")
-        #train_model(config)
-
-    elif args.predict:
-        print("predict")
-        #predict_model(config)
-
-    elif args.eval:
-        print("corr")
-        fileName = "correlationMatrix"
-        #correlation_matrix_make_png(fileName, config)
-        #eval_plot(config)
-        #eval_model(eval_run_args)
+    
+    elif args.dev: 
+        imfs = test_memd_on_segment("Data/processed/data_segments_combined.npz", num_directions=64)
+        print("IMFs shape:", imfs.shape)
+        
     else:
         print("No valid arguments provided. Use --help for usage information.")
 
@@ -73,7 +69,7 @@ def parse_arguments() -> argparse.Namespace:
     Notes
     -----
     This function sets up the argument parser with the following options:
-    --preprocess : Flag to enable preprocessing of sensor and HVAC data.
+    --preprocess : Flag to enable preprocessing of raw EEG data.
     """
     parser = argparse.ArgumentParser(description="Sensor anomaly detection pipeline")
     parser.add_argument(
@@ -87,20 +83,14 @@ def parse_arguments() -> argparse.Namespace:
         help="Enable memd filtering on preprocessed data",
     )
     parser.add_argument(
-        "--train",
+        "--psd",
         action="store_true",
-        help="Enable the training step (not implemented yet)",
+        help="Enable psd feature extraction on memd filtered data",
     )
     parser.add_argument(
-        "--predict",
+        "--dev",
         action="store_true",
-        help="Enable the training step (not implemented yet)",
-    )
-
-    parser.add_argument(
-        "--eval",
-        action="store_true",
-        help="Enable the evaluation step (not implemented yet)",
+        help="Enable development/testing mode",
     )
     return parser.parse_args()
 
