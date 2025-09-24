@@ -35,6 +35,7 @@ def apply_memd_filter(X, memd_params):
         results = pool.map(memd_filter_segment_args, args)
     return np.stack(results)  # shape: (n_segments, n_imfs, 640, 20)
 """
+"""
 def apply_memd_filter(X, memd_params):
     all_imfs = []
     keep_imfs = memd_params["keep_imfs"]
@@ -45,6 +46,37 @@ def apply_memd_filter(X, memd_params):
         all_imfs.append(imfs)
 
     return np.stack(all_imfs)  # (n_segments, n_imfs, 512, 20)
+"""
+def apply_memd_filter(X, memd_params):
+    all_imfs = []
+    keep_imfs = memd_params.get("keep_imfs", None)
+
+    max_imfs = 0
+    tmp_results = []
+
+    # First pass: compute IMFs per segment
+    for i, segment in enumerate(X):
+        imfs = memd_filter_segment_args((segment, memd_params, i, len(X), keep_imfs if keep_imfs else 10**9))
+        tmp_results.append(imfs)
+        max_imfs = max(max_imfs, imfs.shape[0])
+
+    # If keep_imfs is set, restrict to that many
+    if keep_imfs:
+        max_imfs = min(max_imfs, keep_imfs)
+
+    # Second pass: pad to max_imfs
+    for imfs in tmp_results:
+        n_imfs, samples, channels = imfs.shape
+        if n_imfs < max_imfs:
+            pad_shape = (max_imfs - n_imfs, samples, channels)
+            imfs = np.concatenate([imfs, np.zeros(pad_shape, dtype=imfs.dtype)], axis=0)
+        else:
+            imfs = imfs[:max_imfs]  # in case too many
+        all_imfs.append(imfs)
+
+    return np.stack(all_imfs)  # (n_segments, max_imfs, samples, channels)
+
+
 
 
 def save_filtered_data(output_path, X_filtered, y, subject):
