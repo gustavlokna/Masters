@@ -49,7 +49,6 @@ def apply_memd_filter(X, memd_params):
 """
 def apply_memd_filter(X, memd_params):
     all_imfs = []
-    keep_imfs = memd_params.get("keep_imfs", None)
 
     max_imfs = 0
     tmp_results = []
@@ -60,9 +59,6 @@ def apply_memd_filter(X, memd_params):
         tmp_results.append(imfs)
         max_imfs = max(max_imfs, imfs.shape[0])
 
-    # If keep_imfs is set, restrict to that many
-    if keep_imfs:
-        max_imfs = min(max_imfs, keep_imfs)
 
     # Second pass: pad to max_imfs
     for imfs in tmp_results:
