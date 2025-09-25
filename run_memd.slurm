@@ -5,7 +5,7 @@
 
 #SBATCH --partition=GPUQ
 #SBATCH --gres=gpu:1
-#SBATCH --mem=32G
+#SBATCH --mem=300G
 #SBATCH --nodes=1
 #SBATCH --output=memd_out.txt         # ✅ Output file
 #SBATCH --error=memd_err.txt          # ✅ Error file
