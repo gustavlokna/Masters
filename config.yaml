@@ -9,9 +9,13 @@ model:
   output_dir: trained_models
   detector_type: linreg
 
-Output:
+output:
   correlation_matrix: Output/correlation_matrix
   eval: Output/eval
+  imf_metadata_csv: Data/exploration/imf_metadata.csv # Detailed IMF metadata for all channels
+  imf_metadata_excel: Data/exploration/imf_metadata.xlsx # Detailed IMF metadata for all channels in Excel format
+  imf_plot_root: Data/exploration/imf_plots
+  imf_plot_segments: [867, 884]   # example interesting segments
 
 #Extracted from file DreamCatcher/DEV/Greedy_algorithm/top2.ipynb from Adin Belsics masters
 channels:
@@ -28,6 +32,18 @@ memd_params:
   stop_criteria: "stop"
   stop_args: [0.075, 0.75, 0.075]
   keep_imfs: 4   # new param
+
+# List of segments to exclude based on imf extraction. The segments under only gave a max of 4 imfs (3 + residue)
+exclude_segments: [
+  867, 882, 884, 905, 906, 925, 997, 1112, 1167, 1173, 1175, 1178,
+  1396, 1397, 1398, 1399, 1400, 2061, 2062, 2860, 3316, 3317, 3319, 3320,
+  3334, 3340, 3341, 3343, 3358, 3359, 6466, 6922, 6923, 6924, 6928, 6929,
+  6930, 6931, 6933, 6940, 6943, 6944, 7442, 7506, 7563, 7581, 7990, 8005,
+  8176, 8182, 8942, 9091, 9317, 9343, 9350, 9357, 12226, 12236, 12238, 12239,
+  12341, 12347, 12383, 12389, 12391, 12392, 12395, 12404, 12410, 12413, 12420,
+  12422, 12427, 12428
+]
+
 
 psd_bands:
   delta: [0.5, 4]

@@ -5,3 +5,4 @@ pyyaml
 mne
 scikit-learn
 torch
+openpyxl

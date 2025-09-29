@@ -5,6 +5,8 @@ from datapreprocessing.preprocessing import preprocessing
 from datapreprocessing.memd_filtering import apply_memd_pipeline
 from datapreprocessing.psd_filtering import apply_psd_pipeline
 from datapreprocessing.oldTrash import test_memd_on_segment
+from utilities.dataExploration import export_imf_metadata_detailed, plot_imfs_for_segments
+from train.xgboost import train_raw_memd_pipeline
 
 def main(args: argparse.Namespace) -> None:
     """
@@ -49,10 +51,14 @@ def main(args: argparse.Namespace) -> None:
     elif args.psd:
         print("running psd feature extraction")
         apply_psd_pipeline(config)
+
+    elif args.train: 
+        print("running training")
+        train_raw_memd_pipeline(config, keep_imfs=4)
     
     elif args.dev: 
-        imfs = test_memd_on_segment("Data/processed/data_segments_combined.npz", num_directions=64)
-        print("IMFs shape:", imfs.shape)
+        print("data exploration: export imf metadata")
+        plot_imfs_for_segments(config)
         
     else:
         print("No valid arguments provided. Use --help for usage information.")
@@ -91,6 +97,11 @@ def parse_arguments() -> argparse.Namespace:
         "--dev",
         action="store_true",
         help="Enable development/testing mode",
+    )
+    parser.add_argument(
+        "--train",
+        action="store_true",
+        help="Enable training of model on memd filtered data",
     )
     return parser.parse_args()
 
