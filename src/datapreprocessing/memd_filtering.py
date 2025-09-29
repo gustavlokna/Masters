@@ -21,26 +21,7 @@ def memd_filter_segment_args(args):
     return imfs.transpose(0, 2, 1)  # → (n_imfs, samples, channels)
 
 
-"""
-def apply_memd_filter(X, memd_params):
-    keep_imfs = memd_params["keep_imfs"]
-    with Pool(processes=os.cpu_count()) as pool:
-        args = [(segment, memd_params, i, len(X), keep_imfs) for i, segment in enumerate(X)]
-        results = pool.map(memd_filter_segment_args, args)
-    return np.stack(results)  # shape: (n_segments, n_imfs, 640, 20)
-"""
-"""
-def apply_memd_filter(X, memd_params):
-    all_imfs = []
-    keep_imfs = memd_params["keep_imfs"]
 
-    for i, segment in enumerate(X):
-        #print(f"Filtering segment {i+1}/{len(X)}")
-        imfs = memd_filter_segment_args((segment, memd_params, i, len(X), keep_imfs))
-        all_imfs.append(imfs)
-
-    return np.stack(all_imfs)  # (n_segments, n_imfs, 512, 20)
-"""
 def apply_memd_filter(X, memd_params):
     all_imfs = []
     tmp_results = []
