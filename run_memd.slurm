@@ -27,4 +27,4 @@ module load Anaconda3/2023.09-0
 source ~/.bashrc
 conda activate dream_env
 
-python src/main.py --memd
+python src/main.py --train
