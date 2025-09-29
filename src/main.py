@@ -6,7 +6,7 @@ from datapreprocessing.memd_filtering import apply_memd_pipeline
 from datapreprocessing.psd_filtering import apply_psd_pipeline
 from datapreprocessing.oldTrash import test_memd_on_segment
 from utilities.dataExploration import export_imf_metadata_detailed, plot_imfs_for_segments
-from train.xgboost import train_raw_memd_pipeline
+from train.xgboost import train_raw_memd_pipeline, train_raw_pipeline
 
 def main(args: argparse.Namespace) -> None:
     """
@@ -54,7 +54,7 @@ def main(args: argparse.Namespace) -> None:
 
     elif args.train: 
         print("running training")
-        train_raw_memd_pipeline(config, keep_imfs=4)
+        train_raw_pipeline(config, keep_imfs=4)
     
     elif args.dev: 
         print("data exploration: export imf metadata")
