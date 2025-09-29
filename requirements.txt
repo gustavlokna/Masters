@@ -6,3 +6,4 @@ mne
 scikit-learn
 torch
 openpyxl
+xgboost
