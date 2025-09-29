@@ -54,7 +54,7 @@ def main(args: argparse.Namespace) -> None:
 
     elif args.train: 
         print("running training")
-        train_raw_pipeline(config, keep_imfs=4)
+        train_raw_pipeline(config)
     
     elif args.dev: 
         print("data exploration: export imf metadata")
