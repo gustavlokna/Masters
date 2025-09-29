@@ -1,11 +1,11 @@
 import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
+import xgboost as xgb
 from sklearn.metrics import classification_report
 
 def train_raw_memd_pipeline(config: dict, keep_imfs=4):
     """
-    Train tree-based ML model directly on raw MEMD data.
+    Train ML model directly on raw MEMD data.
     Keeps only the first `keep_imfs` IMFs per epoch.
     Optionally excludes specific segments by index.
     """
@@ -34,16 +34,20 @@ def train_raw_memd_pipeline(config: dict, keep_imfs=4):
         X, y, test_size=0.2, stratify=y, random_state=42
     )
 
-    # Random Forest baseline
-    Rf = RandomForestClassifier(
-        n_estimators=200,
-        max_depth=None,
-        n_jobs=-1,
-        random_state=42
+    # XGBoost model
+    model = xgb.XGBClassifier(
+        n_estimators=1000,
+        learning_rate=0.1,
+        objective="binary:logistic",
+        eval_metric="logloss",
+        use_label_encoder=False,
+        random_state=42,
+        tree_method="hist",
+        device="cuda"
     )
-    Rf.fit(X_train, y_train)
+    model.fit(X_train, y_train)
 
     # Predict + eval
-    y_pred = Rf.predict(X_test)
+    y_pred = model.predict(X_test)
     print(classification_report(y_test, y_pred))
 
