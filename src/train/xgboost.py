@@ -87,11 +87,12 @@ def train_raw_pipeline(config: dict):
         learning_rate=0.1,
         objective="binary:logistic",
         eval_metric="logloss",
-        use_label_encoder=False,
         random_state=42,
         tree_method="hist",
+        predictor="gpu_predictor",
         device="cuda"
     )
+
     model.fit(X_train, y_train)
 
     # Predict + eval
