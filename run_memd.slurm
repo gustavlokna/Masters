@@ -1,11 +1,11 @@
 #!/bin/bash
-#SBATCH --account=ie-idi
+#SBATCH --account=share-ie-idi
 #SBATCH --job-name=memd_job
 #SBATCH --time=30:00:00
 
-#SBATCH --partition=CPUQ
-#SBATCH --cpus-per-task=16
-#SBATCH --mem=32G
+#SBATCH --partition=GPUQ
+#SBATCH --gres=gpu:1
+#SBATCH --mem=300G
 #SBATCH --nodes=1
 #SBATCH --output=memd_out.txt         # ✅ Output file
 #SBATCH --error=memd_err.txt          # ✅ Error file
