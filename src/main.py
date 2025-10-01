@@ -4,7 +4,7 @@ from utilities.config import read_config
 from datapreprocessing.preprocessing import preprocessing
 from datapreprocessing.memd_filtering import apply_memd_pipeline
 from datapreprocessing.psd_filtering import apply_psd_pipeline
-from datapreprocessing.oldTrash import test_memd_on_segment
+from datapreprocessing.oldTrash import test_memd_on_segment, edf_to_csv
 from utilities.dataExploration import export_imf_metadata_detailed, plot_imfs_for_segments
 from train.xgboost import train_raw_memd_pipeline, train_raw_pipeline
 
@@ -57,8 +57,11 @@ def main(args: argparse.Namespace) -> None:
         train_raw_pipeline(config)
     
     elif args.dev: 
-        print("data exploration: export imf metadata")
-        plot_imfs_for_segments(config)
+        edf_to_csv(
+        r"C:\Users\Gustav\Documents\5 Klasse\ProsjektOppgave\Code\Dream2025\Data\raw\Tononi Serial Awakenings-Part24-s23_PSGs\Tononi Serial Awakenings\Data\PSG\s23_ep01.edf",
+        out_dir=r"C:\Users\Gustav\Documents\5 Klasse\ProsjektOppgave\Code\Dream2025\Data\processed"
+)
+
         
     else:
         print("No valid arguments provided. Use --help for usage information.")

@@ -24,9 +24,6 @@ def preprocessing(config: dict) -> None:
     )
     records_df = pd.read_csv(records_path)
 
-    # Channel selection
-    top_20_idxs = config["channels"]["top_20"]
-    top_20_names = [f"Chan {i}" for i in top_20_idxs]
 
     # Folder with .edf files
     for i in range(1, 37): # for whom ever takes over code. This is not best practice but simple (i cannot be bothered to dynamically run through subset of files)
@@ -62,17 +59,14 @@ def preprocessing(config: dict) -> None:
             #df = df[top_20_names]  # keep selected channels only
             df = pd.DataFrame(data, columns=labels)
 
-            # Try "Chan X"
-            if set(top_20_names).issubset(df.columns):
-                df = df[top_20_names]
-            else:
-                print("Trying differnt subset of names")
-                fallback_names = [str(i) for i in top_20_idxs]
-                if set(fallback_names).issubset(df.columns):
-                    df = df[fallback_names]
-                else:
-                    raise RuntimeError(f"❌ Channels not found in {fname}. Tried both 'Chan X' and 'X' formats.")
 
+            # keep only Chan 1–256 (or 1–256 if no 'Chan ' prefix)
+            keep_cols = [f"Chan {i}" for i in range(1, 257)]
+            if set(keep_cols).issubset(df.columns):
+                df = df[keep_cols]
+            else:
+                alt_cols = [str(i) for i in range(1, 257)]
+                df = df[alt_cols]
 
 
             # Segment continuous EEG data into non-overlapping 2-second windows
@@ -107,7 +101,7 @@ def preprocessing(config: dict) -> None:
     X_all = np.concatenate(all_X, axis=0)
     y_all = np.concatenate(all_y, axis=0)
 
-    outpath = os.path.join(config["data"]["processed"], f"data_segments_combined_2_5secondepoch.npz")
+    outpath = os.path.join(config["data"]["processed"], f"data_segments_all_channels_combined_2_5secondepoch.npz")
 
     np.savez(
     outpath,
@@ -118,8 +112,10 @@ def preprocessing(config: dict) -> None:
 
     
     print(f"Saved combined data: {outpath} with shape {X_all.shape}")
-
+    ### loads from meory to verify
+    ### May be to large for local ram, if so comment out
+    """
     with np.load(outpath) as data:
         print("Loaded .npz shape:", data["X"].shape, data["y"].shape)
 
-
+    """

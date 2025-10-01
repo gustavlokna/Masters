@@ -223,3 +223,29 @@ def apply_memd_filter(X, memd_params):
 
     return np.stack(all_imfs)  # (n_segments, n_imfs, 512, 20)
 """
+
+
+def edf_to_csv(edf_path: str, out_dir: str = None) -> str:
+    """Load one EDF file and save all channels to CSV with timestamps."""
+    raw = mne.io.read_raw_edf(edf_path, preload=True)
+    print(f"Loaded {edf_path}")
+    print(f"Channels: {len(raw.ch_names)}")
+
+    data = raw.get_data().T  # (samples, channels)
+    labels = raw.ch_names
+    fs = raw.info['sfreq']
+    timestamps = np.arange(data.shape[0]) / fs
+
+    df = pd.DataFrame(data, columns=labels)
+    df.insert(0, "timestamp", timestamps)
+
+    if out_dir is None:
+        out_csv = edf_path.replace(".edf", ".csv")
+    else:
+        os.makedirs(out_dir, exist_ok=True)
+        base = os.path.splitext(os.path.basename(edf_path))[0]
+        out_csv = os.path.join(out_dir, f"{base}.csv")
+
+    df.to_csv(out_csv, index=False)
+    print(f"✅ Saved to {out_csv} with shape {df.shape}")
+    return out_csv

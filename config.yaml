@@ -29,7 +29,7 @@ channels:
 
 memd_params:
   num_directions: 512 # can try 64 or 512 as found in file job2_5 file from Adian Belsics masters
-  stop_criteria: "stop"
+  stop_criteria: "stop" 
   stop_args: [0.075, 0.75, 0.075]
   keep_imfs: 4   # new param
 
