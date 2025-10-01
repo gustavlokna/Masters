@@ -1,6 +1,6 @@
 import numpy as np
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import classification_report
 import xgboost as xgb
 
 
@@ -53,11 +53,14 @@ def leave_one_subject_out(X, y, subject_ids):
         model.fit(X_train, y_train)
         preds = model.predict(X_test)
 
-        acc = accuracy_score(y_test, preds)
-        results[subj] = acc
-        print(f"Subject {subj}: accuracy = {acc:.3f}")
 
-    return results
+        report = classification_report(y_test, preds, zero_division=0, output_dict=False)
+        reports[subj] = report
+
+        print(f"\n=== Subject {subj} ===")
+        print(report)
+
+    return 
 
 
 def loso_pipeline(config):
@@ -72,7 +75,5 @@ def loso_pipeline(config):
             print(f"Skipping {map_name} (not enough classes).")
             continue
 
-        results = leave_one_subject_out(X_filtered, y_filtered, subject_filtered)
-        print("\nFinal results per subject:")
-        for subj, acc in results.items():
-            print(f"Subject {subj}: {acc:.3f}")
+        leave_one_subject_out(X_filtered, y_filtered, subject_filtered)
+        print("\nDone with LOSO for this label map.")
