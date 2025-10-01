@@ -27,7 +27,7 @@ def prepare_data(X, y, subject, label_map):
 
 def leave_one_subject_out(X, y, subject_ids):
     """Train on all other subjects, test on one subject."""
-    results = {}
+    #results = {}
     unique_subjects = np.unique(subject_ids)
 
     for subj in unique_subjects:
