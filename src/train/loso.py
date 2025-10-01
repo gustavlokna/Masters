@@ -41,13 +41,13 @@ def leave_one_subject_out(X, y, subject_ids):
         X_test = scaler.transform(X_test)
 
         model = xgb.XGBClassifier(
-            n_estimators=500,
-            learning_rate=0.1,
-            objective="binary:logistic",
-            eval_metric="logloss",
-            random_state=42,
-            tree_method="hist",
-            device="cuda"
+        n_estimators=1000, 
+        learning_rate=0.1,
+        objective='binary:logistic', 
+        eval_metric='logloss',
+        use_label_encoder=False, random_state=42,
+        tree_method='hist', 
+        device='cuda'
         )
 
         model.fit(X_train, y_train)
