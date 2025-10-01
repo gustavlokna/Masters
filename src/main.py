@@ -59,8 +59,7 @@ def main(args: argparse.Namespace) -> None:
     elif args.dev: 
         edf_to_csv(
         r"C:\Users\Gustav\Documents\5 Klasse\ProsjektOppgave\Code\Dream2025\Data\raw\Tononi Serial Awakenings-Part24-s23_PSGs\Tononi Serial Awakenings\Data\PSG\s23_ep01.edf",
-        out_dir=r"C:\Users\Gustav\Documents\5 Klasse\ProsjektOppgave\Code\Dream2025\Data\processed"
-)
+        out_dir=r"C:\Users\Gustav\Documents\5 Klasse\ProsjektOppgave\Code\Dream2025\Data\processed")
 
         
     else:
