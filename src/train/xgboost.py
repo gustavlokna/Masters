@@ -1,3 +1,4 @@
+"""
 import os
 import numpy as np
 import pandas as pd
@@ -14,6 +15,7 @@ import xgboost as xgb
 
 def full_pipeline(config: dict) -> None:
     """
+"""
     Full pipeline:
     - Preprocess raw EDF → segments
     - Compute PSD features
@@ -21,6 +23,7 @@ def full_pipeline(config: dict) -> None:
     - Train + evaluate XGBoost classifier
     - Save results + feature importances
     """
+"""
     # ------------------------------
     # Step 1: Preprocessing
     # ------------------------------
@@ -137,3 +140,4 @@ def full_pipeline(config: dict) -> None:
     summary_df.to_csv(outpath, index=False)
     print(f"\n== Done. Summary saved to {outpath} ==")
     print(summary_df)
+"""

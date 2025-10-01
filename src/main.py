@@ -54,7 +54,7 @@ def main(args: argparse.Namespace) -> None:
 
     elif args.train: 
         print("running training")
-        train_raw_pipeline(config)
+        #train_raw_pipeline(config)
     
     elif args.dev: 
         edf_to_csv(
