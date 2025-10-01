@@ -55,7 +55,7 @@ def leave_one_subject_out(X, y, subject_ids):
 
 
         report = classification_report(y_test, preds, zero_division=0, output_dict=False)
-        reports[subj] = report
+        #reports[subj] = report
 
         print(f"\n=== Subject {subj} ===")
         print(report)
