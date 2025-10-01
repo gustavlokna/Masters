@@ -5,15 +5,21 @@ from scipy.signal import welch
 def load_data(npz_path):
     """Load preprocessed data from .npz file."""
     data = np.load(npz_path)
-    X, y, subject = data["X"], data["y"], data["subject"]
-    print(f"Loaded: X={X.shape}, y={y.shape}, subject={subject.shape}")
-    return X, y, subject
+    X, y, subject, sex = data["X"], data["y"], data["subject"], data["sex"]
+    print(f"Loaded: X={X.shape}, y={y.shape}, subject={subject.shape}, sex ={sex.shape}")
+    return X, y, subject, sex
 
 
-def save_psd_data(output_path, X_psd, y, subject, band_names):
-    """Save PSD features along with labels, subjects, and band names."""
-    np.savez(output_path, X=X_psd, y=y, subject=subject, bands=band_names)
-    print(f"Saved PSD features to {output_path} with shape {X_psd.shape}")
+def save_psd_data(output_path, X_psd, y, subject, sex, band_names):
+    """Save PSD features along with labels, subjects, sex, and band names."""
+    np.savez(
+        output_path,
+        X=X_psd,
+        y=y,
+        subject=subject,
+        sex=sex,
+        bands=band_names
+    )
 
 
 def compute_psd_features(X, bands, fs=256):
@@ -63,6 +69,6 @@ def apply_psd_pipeline(config: dict) -> None:
     output_path = config["data"]["psd"]
     bands = config["psd_bands"]
 
-    X, y, subject = load_data(input_path)
+    X, y, subject, sex = load_data(input_path)
     X_psd, band_names = compute_psd_features(X, bands, fs=256)
-    save_psd_data(output_path, X_psd, y, subject, band_names)
+    save_psd_data(output_path, X_psd, y, subject, sex, band_names)

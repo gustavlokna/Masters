@@ -14,6 +14,7 @@ def preprocessing(config: dict) -> None:
     all_X = []
     all_y = []
     all_subjects = []
+    all_sexes = []
 
     # Load metadata
     records_path = os.path.join(
@@ -56,8 +57,6 @@ def preprocessing(config: dict) -> None:
             # Keeping only Channels that Adins Greedy search algorthim idetified as most usefull
             # TODO are these still the best channels when splitting into man and woman files? 
             df = pd.DataFrame(data, columns=labels)
-            #df = df[top_20_names]  # keep selected channels only
-            df = pd.DataFrame(data, columns=labels)
 
 
             # keep only Chan 1–256 (or 1–256 if no 'Chan ' prefix)
@@ -81,41 +80,41 @@ def preprocessing(config: dict) -> None:
                 for i in range(num_segments)
             ])
 
-            # Get experience label
+            # Get metadata (experience + sex)
             meta = records_df[records_df["Filename"] == fname]
             if meta.empty:
                 raise RuntimeError(f"❌ No metadata found for file: {fname}")
             label = meta.iloc[0]["Experience"]
-            y = np.full((num_segments,), label)
+            sex = meta.iloc[0]["Subject sex"]  # 0=female, 1=male
 
-            # Append data to list 
+            y = np.full((num_segments,), label)
+            sex_array = np.full((num_segments,), sex)
+            subject_array = np.full((num_segments,), subject_id)
+
+            # Append to lists
             all_X.append(X)
             all_y.append(y)
-
-            subject_array = np.full((num_segments,), subject_id)
             all_subjects.append(subject_array)
-            subject_all = np.concatenate(all_subjects, axis=0)
+            all_sexes.append(sex_array)
 
-
-    # Save data 
+    # Concatenate all subjects
     X_all = np.concatenate(all_X, axis=0)
     y_all = np.concatenate(all_y, axis=0)
+    subject_all = np.concatenate(all_subjects, axis=0)
+    sex_all = np.concatenate(all_sexes, axis=0)
 
-    outpath = os.path.join(config["data"]["processed"], f"data_segments_all_channels_combined_2_5secondepoch.npz")
-
-    np.savez(
-    outpath,
-    X=X_all,
-    y=y_all,
-    subject=subject_all  
+    # Save data
+    outpath = os.path.join(
+        config["data"]["processed"],
+        "data_segments_all_channels_combined_2_5secondepoch.npz"
     )
 
-    
-    print(f"Saved combined data: {outpath} with shape {X_all.shape}")
-    ### loads from meory to verify
-    ### May be to large for local ram, if so comment out
-    """
-    with np.load(outpath) as data:
-        print("Loaded .npz shape:", data["X"].shape, data["y"].shape)
+    np.savez(
+        outpath,
+        X=X_all,
+        y=y_all,
+        subject=subject_all,
+        sex=sex_all
+    )
 
-    """
+    print(f"Saved combined data: {outpath} with shape {X_all.shape}")
