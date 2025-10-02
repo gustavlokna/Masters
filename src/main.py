@@ -6,8 +6,7 @@ from datapreprocessing.memd_filtering import apply_memd_pipeline
 from datapreprocessing.psd_filtering import apply_psd_pipeline
 from datapreprocessing.oldTrash import test_memd_on_segment, edf_to_csv
 from utilities.dataExploration import export_imf_metadata_detailed, plot_imfs_for_segments
-from train.xgboost import run_training_pipeline
-from train.loso import loso_pipeline 
+from train.loso_cnn import loso_pipeline 
 
 def main(args: argparse.Namespace) -> None:
     """
