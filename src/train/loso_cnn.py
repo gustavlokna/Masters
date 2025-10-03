@@ -89,6 +89,6 @@ def loso_cnn_pipeline(config):
             print(f"skip {map_name}: not enough classes after mapping")
             continue
         leave_one_subject_out(Xf, yf, subjf, map_name,
-                              epochs=config.get("train", {}).get("epochs", 30),
-                              batch_size=config.get("train", {}).get("batch_size", 64),
-                              verbose=config.get("train", {}).get("verbose", 0))
+                              epochs= 30,
+                              batch_size= 64,
+                              verbose= 0)
