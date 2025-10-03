@@ -36,12 +36,17 @@ def leave_one_subject_out(X, y, subject_ids, sex_ids, map_name):
     unique_subjects = np.unique(subject_ids)
 
     for subj in unique_subjects:
-        X_train = X[subject_ids != subj]
-        y_train = y[subject_ids != subj]
+        sex_subj = np.unique(sex_ids[subject_ids == subj])[0]
+
+        # mask: alle andre subjekter med samme sex
+        train_mask = (subject_ids != subj) & (sex_ids == sex_subj)
+
+        X_train = X[train_mask]
+        y_train = y[train_mask]
         X_test = X[subject_ids == subj]
         y_test = y[subject_ids == subj]
-        sex_subj = np.unique(sex_ids[subject_ids == subj])[0]  # same for whole subject
 
+        
         scaler = StandardScaler()
         X_train = scaler.fit_transform(X_train)
         X_test = scaler.transform(X_test)
