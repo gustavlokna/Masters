@@ -46,9 +46,6 @@ def apply_memd_filter(X, memd_params):
     return np.stack(all_imfs)  # (n_segments, max_imfs, samples, channels)
 
 
-
-
-
 def save_filtered_data(output_path, X_filtered, y, subject):
     np.savez(output_path, X=X_filtered, y=y, subject=subject)
     print(f"Saved filtered data to {output_path} with shape {X_filtered.shape}")

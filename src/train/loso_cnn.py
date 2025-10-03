@@ -82,7 +82,7 @@ def leave_one_subject_out(X, y, subject_ids, sex_ids, map_name, epochs=10, batch
     return results
 
 
-def loso_pipeline(config, excel_out="loso_cnn_results.xlsx"):
+def loso_pipeline(config, excel_out="loso_cnn_64_results.xlsx"):
     X, y, subject, band_names, sex = load_psd_data(config["data"]["psd"])
     all_results = []
 
@@ -96,7 +96,7 @@ def loso_pipeline(config, excel_out="loso_cnn_results.xlsx"):
 
         results = leave_one_subject_out(
             X_filtered, y_filtered, subject_filtered, sex_filtered, map_name,
-            epochs=200,
+            epochs=64,
             batch_size=32
         )
         all_results.extend(results)
