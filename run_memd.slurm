@@ -1,14 +1,14 @@
 #!/bin/bash
 #SBATCH --account=share-ie-idi
-#SBATCH --job-name=psd  
+#SBATCH --job-name=CNN  
 #SBATCH --time=30:00:00
 
 #SBATCH --partition=GPUQ
 #SBATCH --gres=gpu:1
 #SBATCH --mem=300G
 #SBATCH --nodes=1
-#SBATCH --output=psd_out.txt         # ✅ Output file
-#SBATCH --error=Psd_err.txt          # ✅ Error file
+#SBATCH --output=cnn_out.txt         # ✅ Output file
+#SBATCH --error=cnn_err.txt          # ✅ Error file
 
 #SBATCH --mail-user=gustal@stud.ntnu.no
 #SBATCH --mail-type=ALL

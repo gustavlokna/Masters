@@ -1,94 +1,111 @@
 import numpy as np
 import pandas as pd
+from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import classification_report
-from sklearn.utils.class_weight import compute_class_weight
+import xgboost as xgb
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv1D, LSTM, Dense, Dropout
-from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.layers import Dense, Dropout, Conv1D, MaxPooling1D, LSTM, Reshape
 
-# ---------- IO ----------
+
+
 def load_psd_data(npz_path):
+    """Load PSD features + labels from .npz file."""
     data = np.load(npz_path, allow_pickle=True)
-    X, y = data["X"], data["y"]
-    subject = data["subject"]
-    bands = list(data["bands"])
-    # optional: sex may or may not exist
-    sex = data["sex"] if "sex" in data.files else None
-    print(f"Loaded PSD: X={X.shape} (epochs, bands, channels), y={y.shape}, bands={bands}")
+    X, y, subject, bands, sex = data["X"], data["y"], data["subject"], data["bands"], data["sex"]
+    print(f"Loaded PSD data: X={X.shape}, y={y.shape}, bands={bands}")
     return X, y, subject, bands, sex
 
-def prepare_data(X, y, subject, label_map):
+
+def prepare_data(X, y, subject, sex, label_map):
+    """Flatten features and remap labels according to label_map."""
+    n_epochs, n_bands, n_channels = X.shape
+    X_flat = X.reshape(n_epochs, n_bands * n_channels)
+
     mask = np.array([label_map.get(lbl, None) is not None for lbl in y])
-    Xf = X[mask]                         # (epochs, bands, channels)
-    yf = np.array([label_map[lbl] for lbl in y[mask]], dtype=int)
-    subjf = subject[mask]
-    return Xf, yf, subjf
+    X_filtered = X_flat[mask]
+    y_filtered = np.array([label_map[lbl] for lbl in y[mask]], dtype=int)
+    subject_filtered = subject[mask]
+    sex_filtered = sex[mask]
 
-# ---------- Model ----------
-def build_seq_model(input_shape):
-    # input_shape = (timesteps=256, features=4)
-    m = Sequential([
-        Conv1D(64, kernel_size=7, padding="same", activation="relu", input_shape=input_shape),
-        Conv1D(64, kernel_size=7, padding="same", activation="relu"),
-        LSTM(64),
-        Dropout(0.5),
-        Dense(1, activation="sigmoid"),
-    ])
-    m.compile(optimizer=Adam(1e-3), loss="binary_crossentropy", metrics=["accuracy"])
-    return m
+    return X_filtered, y_filtered, subject_filtered, sex_filtered
 
-def standardize_train_test(X_train, X_test):
-    # per-feature standardization over epochs
-    mu = X_train.mean(axis=0, keepdims=True)
-    sd = X_train.std(axis=0, keepdims=True) + 1e-8
-    return (X_train - mu) / sd, (X_test - mu) / sd
 
-# ---------- LOSO ----------
-def leave_one_subject_out(X, y, subject_ids, map_name, epochs=30, batch_size=64, verbose=0):
-    # reshape to (epochs, timesteps=256, features=4): channels-as-time
-    # current X is (epochs, bands=4, channels=256)
-    X = np.transpose(X, (0, 2, 1))  # -> (epochs, 256, 4)
-
+def leave_one_subject_out(X, y, subject_ids, sex_ids, map_name):
+    """Train on all other subjects, test on one subject, save results to DataFrame."""
+    results = []
     unique_subjects = np.unique(subject_ids)
 
     for subj in unique_subjects:
-        tr = subject_ids != subj
-        te = subject_ids == subj
+        X_train = X[subject_ids != subj]
+        y_train = y[subject_ids != subj]
+        X_test = X[subject_ids == subj]
+        y_test = y[subject_ids == subj]
+        sex_subj = np.unique(sex_ids[subject_ids == subj])[0]  # same for whole subject
 
-        X_tr, y_tr = X[tr], y[tr]
-        X_te, y_te = X[te], y[te]
+        scaler = StandardScaler()
+        X_train = scaler.fit_transform(X_train)
+        X_test = scaler.transform(X_test)
 
-        # skip if train or test is single-class (can’t learn/measure)
-        if np.unique(y_tr).size < 2 or np.unique(y_te).size < 2:
-            print(f"[{map_name}] skip subject {subj}: single-class split (train {np.unique(y_tr)}, test {np.unique(y_te)})")
-            continue
+        # CNN+LSTM som tar flat input og reshaper internt
+        model = Sequential()
+        model.add(Reshape((X_train.shape[1], 1), input_shape=(X_train.shape[1],)))
+        model.add(Conv1D(filters=32, kernel_size=3, activation="relu"))
+        model.add(MaxPooling1D(pool_size=2))
+        model.add(LSTM(64))
+        model.add(Dropout(0.5))
+        model.add(Dense(1, activation="sigmoid"))
 
-        # standardize on train stats
-        X_tr, X_te = standardize_train_test(X_tr, X_te)
+        model.compile(optimizer="adam", loss="binary_crossentropy", metrics=["accuracy"])
 
-        # class weights to reduce constant predictions on imbalanced splits
-        classes = np.array([0, 1])
-        cw_vals = compute_class_weight("balanced", classes=classes, y=y_tr)
-        class_weight = {int(c): float(w) for c, w in zip(classes, cw_vals)}
+        model.fit(X_train, y_train, epochs=20, batch_size=32, verbose=0, validation_data=(X_test, y_test))
 
-        model = build_seq_model(input_shape=(X_tr.shape[1], X_tr.shape[2]))
-        model.fit(X_tr, y_tr, epochs=epochs, batch_size=batch_size, verbose=verbose,
-                  class_weight=class_weight, validation_data=(X_te, y_te))
+        preds = (model.predict(X_test) > 0.5).astype(int).flatten()
 
-        preds = (model.predict(X_te, verbose=0).ravel() >= 0.5).astype(int)
-        print(f"\n[{map_name}] Subject {subj}")
-        print(classification_report(y_te, preds, zero_division=0))
+        # classification report (macro avg only)
+        report = classification_report(y_test, preds, zero_division=0, output_dict=True)
 
-# ---------- Entry ----------
-def loso_cnn_pipeline(config):
-    X, y, subject, band_names, _ = load_psd_data(config["data"]["psd"])
+        # counts
+        pred_0 = int(np.sum(preds == 0))
+        pred_1 = int(np.sum(preds == 1))
+        true_0 = int(np.sum(y_test == 0))
+        true_1 = int(np.sum(y_test == 1))
+
+        row = {
+            "label_map": map_name,
+            "subject": subj,
+            "sex": sex_subj,
+            "precision": report["macro avg"]["precision"],
+            "recall": report["macro avg"]["recall"],
+            "f1": report["macro avg"]["f1-score"],
+            "support": report["macro avg"]["support"],
+            "pred_0": pred_0,
+            "true_0": true_0,
+            "pred_1": pred_1,
+            "true_1": true_1,
+        }
+        results.append(row)
+
+    return results
+
+
+def loso_pipeline(config, excel_out="loso_results_cnn_New.xlsx"):
+    """Main entry point for LOSO training pipeline."""
+    X, y, subject, band_names, sex = load_psd_data(config["data"]["psd"])
+    all_results = []
+
     for map_name, label_map in config["label_maps"].items():
-        print(f"\n=== Label map: {map_name} ===")
-        Xf, yf, subjf = prepare_data(X, y, subject, label_map)
-        if np.unique(yf).size < 2:
-            print(f"skip {map_name}: not enough classes after mapping")
+        print(f"\n=== Running label map: {map_name} ===")
+        X_filtered, y_filtered, subject_filtered, sex_filtered = prepare_data(X, y, subject, sex, label_map)
+
+        if len(np.unique(y_filtered)) < 2:
+            print(f"Skipping {map_name} (not enough classes).")
             continue
-        leave_one_subject_out(Xf, yf, subjf, map_name,
-                              epochs= 30,
-                              batch_size= 64,
-                              verbose= 0)
+
+        results = leave_one_subject_out(X_filtered, y_filtered, subject_filtered, sex_filtered, map_name)
+        all_results.extend(results)
+        print(f"Done with LOSO for {map_name}.")
+
+    # Save to Excel
+    df = pd.DataFrame(all_results)
+    df.to_excel(excel_out, index=False)
+    print(f"\n✅ Results saved to {excel_out}")
