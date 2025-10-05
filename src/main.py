@@ -8,6 +8,7 @@ from datapreprocessing.oldTrash import test_memd_on_segment, edf_to_csv
 from utilities.dataExploration import export_imf_metadata_detailed, plot_imfs_for_segments
 from train.loso_cnn import loso_pipeline 
 from datapreprocessing.csp_filtering import run_csp_extraction
+from train.knn import knn_validation
 def main(args: argparse.Namespace) -> None:
     """
     Main function for the ML Piple
@@ -53,10 +54,9 @@ def main(args: argparse.Namespace) -> None:
     elif args.psd:
         print("running psd feature extraction")
         apply_psd_pipeline(config)
-
     elif args.train: 
         print("running training")
-        loso_pipeline(config)
+        knn_validation(config)
     
     elif args.dev: 
         print("development mode")
@@ -105,6 +105,7 @@ def parse_arguments() -> argparse.Namespace:
         action="store_true",
         help="Enable csp feature extraction on preprocessed data",
     )
+    
     parser.add_argument(
         "--train",
         action="store_true",

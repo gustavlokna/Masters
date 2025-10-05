@@ -42,7 +42,7 @@ def train_and_evaluate(X, y, test_size=0.3, random_state=42):
     return model
 
 
-def run_training_pipeline(config):
+def knn_validation(config):
     """Main entry point for CSP + KNN training pipeline."""
     path = config['data']['csp']
     X, y, subject, sex = load_csp_data(path)
