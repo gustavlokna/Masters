@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --account=share-ie-idi
-#SBATCH --job-name=psd_mlp        # ✅ Job name  
+#SBATCH --job-name=psd_mlp_test        # ✅ Job name  
 #SBATCH --time=30:00:00
 
 #SBATCH --partition=GPUQ
