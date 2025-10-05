@@ -7,8 +7,8 @@
 #SBATCH --gres=gpu:1
 #SBATCH --mem=300G
 #SBATCH --nodes=1
-#SBATCH --output=knn_out.txt         # ✅ Output file
-#SBATCH --error=knn_err.txt          # ✅ Error file
+#SBATCH --output=memd_out.txt         # ✅ Output file
+#SBATCH --error=memd_err.txt          # ✅ Error file
 
 #SBATCH --mail-user=gustal@stud.ntnu.no
 #SBATCH --mail-type=ALL

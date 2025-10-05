@@ -8,8 +8,7 @@ from datapreprocessing.oldTrash import test_memd_on_segment, edf_to_csv
 from utilities.dataExploration import export_imf_metadata_detailed, plot_imfs_for_segments
 from Dream2025.src.train.loso_psd import loso_pipeline 
 from datapreprocessing.csp_filtering import run_csp_extraction
-from train.knn import knn_validation
-from Dream2025.src.train.loso_csp import loso_psd_pipeline
+
 def main(args: argparse.Namespace) -> None:
     """
     Main function for the ML Piple
@@ -58,7 +57,7 @@ def main(args: argparse.Namespace) -> None:
 
     elif args.train: 
         print("running training")
-        loso_psd_pipeline(config)
+        
     
     elif args.dev: 
         print("development mode")
