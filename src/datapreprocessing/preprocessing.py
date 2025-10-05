@@ -103,7 +103,8 @@ def preprocessing(config: dict) -> None:
             if not clean_segments:
                 continue
 
-            X = np.stack(clean_segments)
+            #X = np.stack(clean_segments)
+            X = np.stack(clean_segments).astype(np.float32)
 
             meta = records_df[records_df["Filename"] == fname]
             if meta.empty:
