@@ -7,7 +7,7 @@ data:
   csp: Data/processed/CSP_hz_125_epoch_10s_singleband.npz # Combined CSP features from all subjects
   csp_fbcsp: Data/processed/CSP_hz_125_epoch_10s_fbcsp.npz # Combined FBCSP features from all subjects
   fs: 256  # Target sampling frequency after downsampling
-  epoch_length: 2.5 # Length of each epoch in seconds
+  epoch_length: 5 # Length of each epoch in seconds
 
 model:
   output_dir: trained_models
@@ -50,13 +50,21 @@ exclude_segments: [
   12422, 12427, 12428
 ]
 
+#paper psd_bands 
+"psd_bands": {
+    "delta": [1, 4],
+    "theta": [4, 8],
+    "alpha": [8, 13],
+    "beta": [13, 25],
+    "gamma": [25, 40]
+}
 
-psd_bands:
+# AIDNS
+psd_bands_old:
   delta: [0.5, 4]
   theta: [4, 8]
   alpha: [8, 12]
   beta: [13, 30]
-
 
 csp:
   n_components: 6
