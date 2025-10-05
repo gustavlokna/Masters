@@ -19,7 +19,7 @@ def save_mixed_data(output_path, X, y, subject, sex, synthetic_flag):
     print(f"Saved mixed data to {output_path} with shape {X.shape}")
 
 
-def mix_imfs_channel_consistent(X, y, subject, sex, n_imfs=4, n_new=1000, filter_on_sex=False):
+def mix_imfs_channel_consistent(X, y, subject, sex, n_imfs=4, n_new=10000, filter_on_sex=False):
     """
     X: (n_segments, n_imfs, samples, channels)
     y: (n_segments,)
