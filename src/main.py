@@ -101,6 +101,11 @@ def parse_arguments() -> argparse.Namespace:
         help="Enable development/testing mode",
     )
     parser.add_argument(
+        "--csp",
+        action="store_true",
+        help="Enable csp feature extraction on preprocessed data",
+    )
+    parser.add_argument(
         "--train",
         action="store_true",
         help="Enable training of model on memd filtered data",
