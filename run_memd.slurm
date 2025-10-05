@@ -1,14 +1,14 @@
 #!/bin/bash
 #SBATCH --account=share-ie-idi
-#SBATCH --job-name=memd        # ✅ Job name  
+#SBATCH --job-name=psd_mlp        # ✅ Job name  
 #SBATCH --time=30:00:00
 
 #SBATCH --partition=GPUQ
 #SBATCH --gres=gpu:1
 #SBATCH --mem=300G
 #SBATCH --nodes=1
-#SBATCH --output=memd_out.txt         # ✅ Output file
-#SBATCH --error=memd_err.txt          # ✅ Error file
+#SBATCH --output=psd_mlp_out.txt         # ✅ Output file
+#SBATCH --error=psd_mlp_err.txt          # ✅ Error file
 
 #SBATCH --mail-user=gustal@stud.ntnu.no
 #SBATCH --mail-type=ALL
@@ -27,4 +27,4 @@ module load Anaconda3/2023.09-0
 source ~/.bashrc
 conda activate dream_env
 
-python src/main.py --memd
+python src/main.py --psd
