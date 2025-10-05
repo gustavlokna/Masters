@@ -9,6 +9,7 @@ from utilities.dataExploration import export_imf_metadata_detailed, plot_imfs_fo
 from train.loso_cnn import loso_pipeline 
 from datapreprocessing.csp_filtering import run_csp_extraction
 from train.knn import knn_validation
+from train.loso_psd import loso_psd_pipeline
 def main(args: argparse.Namespace) -> None:
     """
     Main function for the ML Piple
@@ -54,9 +55,10 @@ def main(args: argparse.Namespace) -> None:
     elif args.psd:
         print("running psd feature extraction")
         apply_psd_pipeline(config)
+
     elif args.train: 
         print("running training")
-        knn_validation(config)
+        loso_psd_pipeline(config)
     
     elif args.dev: 
         print("development mode")
