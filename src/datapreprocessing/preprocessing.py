@@ -6,9 +6,9 @@ import mne
 
 def preprocessing(config: dict) -> None:
     print("starting preprocess")
-    fs_target = 256
+    fs_target = config["data"]["fs"]
     crop_tmax = 119.998 # As time is zero indexed this corps the 120 first seconds
-    epoch_length = 2.5 # seconds
+    epoch_length = config["data"]["epoch_length"] # seconds
     segment_len = int(epoch_length * fs_target)  # 640 samples
 
     all_X = []
@@ -106,7 +106,7 @@ def preprocessing(config: dict) -> None:
     # Save data
     outpath = os.path.join(
         config["data"]["processed"],
-        "data_segments_all_channels_combined_2_5secondepoch.npz"
+        f"segmented_{epoch_length}s_epoch_{fs_target}hz.npz"
     )
 
     np.savez(

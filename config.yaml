@@ -1,9 +1,11 @@
 data:
   raw: Data/raw/  
   processed: Data/processed
-  preprocessed: "Data/processed/data_segments_all_channels_combined_2_5secondepoch.npz" # Combined preprocessed data from all subjects
+  preprocessed: "Data/processed/segmented_10s_epoch_125hz.npz" # Combined preprocessed data from all subjects
   memd: "Data/processed/data_segments_MEMD_filtered_24_512_dir_sep_Padding.npz" # Combined MEMD filtered data from all subjects
   psd: Data/processed/data_segments_PSD_features.npz # Combined PSD features from all subjects
+  fs: 125  # Target sampling frequency after downsampling
+  epoch_length: 10 # Length of each epoch in seconds
 
 model:
   output_dir: trained_models
@@ -53,6 +55,18 @@ psd_bands:
   alpha: [8, 12]
   beta: [13, 30]
 
+
+csp:
+  n_components: 6
+  reg: null
+  cov_est: concat
+  band: [8, 30]
+
+fbcsp:
+  bands:
+    - [4, 8]
+    - [8, 12]
+    - [12, 30]
 
 label_maps:
   0_vs_2: {0: 0, 1: null, 2: 1}

@@ -7,7 +7,7 @@ from datapreprocessing.psd_filtering import apply_psd_pipeline
 from datapreprocessing.oldTrash import test_memd_on_segment, edf_to_csv
 from utilities.dataExploration import export_imf_metadata_detailed, plot_imfs_for_segments
 from train.loso_cnn import loso_pipeline 
-
+from datapreprocessing.csp_filtering import run_csp_extraction
 def main(args: argparse.Namespace) -> None:
     """
     Main function for the ML Piple
@@ -44,10 +44,12 @@ def main(args: argparse.Namespace) -> None:
         print("completed data preprocessing")
     elif args.memd:
         print("running memd filtering")
-
         apply_memd_pipeline(config)
+    elif args.csp:
+        print("running csp feature extraction")
         
-        print("running memd")
+        run_csp_extraction(config)
+
     elif args.psd:
         print("running psd feature extraction")
         apply_psd_pipeline(config)
