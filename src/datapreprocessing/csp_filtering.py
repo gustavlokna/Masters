@@ -36,7 +36,7 @@ def extract_csp_features(X, y, fs, config, band=None):
 def run_csp_extraction(config: dict):
     print("Running CSP extraction")
 
-    fs = config["data"]["sampling_rate"]
+    fs = config["data"]["fs"]
     epoch_length = config["data"]["epoch_length"]
     input_path = config["data"]["preprocessed"]
     X, y, subject, sex = load_data(input_path)
