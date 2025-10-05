@@ -27,15 +27,13 @@ def model_mlp(input_dim, X_train, y_train, X_test):
 
 
 def prepare_data(X, y, subject, sex, label_map):
-    n_epochs, n_bands, n_channels = X.shape
-    X_flat = X.reshape(n_epochs, n_bands * n_channels)
-
+    #n_epochs, n_bands, n_channels = X.shape
+    #X_flat = X.reshape(n_epochs, n_bands * n_channels)
     mask = np.array([label_map.get(lbl, None) is not None for lbl in y])
-    X_filtered = X_flat[mask]
+    X_filtered = X[mask]
     y_filtered = np.array([label_map[lbl] for lbl in y[mask]], dtype=int)
     subject_filtered = subject[mask]
     sex_filtered = sex[mask]
-
     return X_filtered, y_filtered, subject_filtered, sex_filtered
 
 
