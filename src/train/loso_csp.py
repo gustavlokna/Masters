@@ -7,13 +7,13 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, Conv1D, MaxPooling1D, LSTM, Reshape
 
 
-
-def load_psd_data(npz_path):
-    """Load PSD features + labels from .npz file."""
+def load_csp_data(npz_path):
+    """Load CSP features + labels from .npz file."""
     data = np.load(npz_path, allow_pickle=True)
-    X, y, subject, bands, sex = data["X"], data["y"], data["subject"], data["bands"], data["sex"]
-    print(f"Loaded PSD data: X={X.shape}, y={y.shape}, bands={bands}")
-    return X, y, subject, bands, sex
+    X, y, subject, sex = data["X"], data["y"], data["subject"], data["sex"]
+    print(f"Loaded CSP data: X={X.shape}, y={y.shape}")
+    return X, y, subject, sex
+
 
 def cnn_model(input_shape, X_train, y_train, X_test, y_test):
     """Define and compile a simple CNN+LSTM model."""
@@ -27,7 +27,8 @@ def cnn_model(input_shape, X_train, y_train, X_test, y_test):
 
     model.compile(optimizer="adam", loss="binary_crossentropy", metrics=["accuracy"])
     model.fit(X_train, y_train, epochs=20, batch_size=32, verbose=0, validation_data=(X_test, y_test))
-    return (model.predict(X_test) > 0.5).astype(int).flatten() 
+    return (model.predict(X_test) > 0.5).astype(int).flatten()
+
 
 def model_xgboost(X_train, y_train, X_test):
     """Train and predict using XGBoost."""
@@ -35,13 +36,11 @@ def model_xgboost(X_train, y_train, X_test):
     model.fit(X_train, y_train)
     return model.predict(X_test)
 
-def prepare_data(X, y, subject, sex, label_map):
-    """Flatten features and remap labels according to label_map."""
-    n_epochs, n_bands, n_channels = X.shape
-    X_flat = X.reshape(n_epochs, n_bands * n_channels)
 
+def prepare_data(X, y, subject, sex, label_map):
+    """Filter CSP features and remap labels according to label_map."""
     mask = np.array([label_map.get(lbl, None) is not None for lbl in y])
-    X_filtered = X_flat[mask]
+    X_filtered = X[mask]
     y_filtered = np.array([label_map[lbl] for lbl in y[mask]], dtype=int)
     subject_filtered = subject[mask]
     sex_filtered = sex[mask]
@@ -57,31 +56,21 @@ def leave_one_subject_out(X, y, subject_ids, sex_ids, map_name):
     for subj in unique_subjects:
         sex_subj = np.unique(sex_ids[subject_ids == subj])[0]
 
-        # mask: alle andre subjekter med samme sex
         train_mask = (subject_ids != subj) & (sex_ids == sex_subj)
-
         X_train = X[train_mask]
         y_train = y[train_mask]
         X_test = X[subject_ids == subj]
         y_test = y[subject_ids == subj]
 
-        
         scaler = StandardScaler()
         X_train = scaler.fit_transform(X_train)
         X_test = scaler.transform(X_test)
 
         # Choose model: CNN or XGBoost
-        #preds = cnn_model(X_train.shape[1:], X_train, y_train, X_test, y_test)
+        # preds = cnn_model(X_train.shape[1:], X_train, y_train, X_test, y_test)
         preds = model_xgboost(X_train, y_train, X_test)
 
-        # classification report (macro avg only)
         report = classification_report(y_test, preds, zero_division=0, output_dict=True)
-
-        # counts
-        pred_0 = int(np.sum(preds == 0))
-        pred_1 = int(np.sum(preds == 1))
-        true_0 = int(np.sum(y_test == 0))
-        true_1 = int(np.sum(y_test == 1))
 
         row = {
             "label_map": map_name,
@@ -91,19 +80,21 @@ def leave_one_subject_out(X, y, subject_ids, sex_ids, map_name):
             "recall": report["macro avg"]["recall"],
             "f1": report["macro avg"]["f1-score"],
             "support": report["macro avg"]["support"],
-            "pred_0": pred_0,
-            "true_0": true_0,
-            "pred_1": pred_1,
-            "true_1": true_1,
+            "pred_0": int(np.sum(preds == 0)),
+            "true_0": int(np.sum(y_test == 0)),
+            "pred_1": int(np.sum(preds == 1)),
+            "true_1": int(np.sum(y_test == 1)),
         }
         results.append(row)
 
     return results
 
 
-def loso_pipeline(config, excel_out="loso_results_psd_data.xlsx"):
-    """Main entry point for LOSO training pipeline."""
-    X, y, subject, band_names, sex = load_psd_data(config["data"]["psd"])
+def loso_psd_pipeline(config, excel_out="loso_results_csp_data.xlsx"):
+    """Main entry point for LOSO training pipeline on CSP data."""
+    # Just read directly from config
+    csp_path = config["data"]["csp"]  # or config["data"]["csp_fbcsp"] for FBCSP
+    X, y, subject, sex = load_csp_data(csp_path)
     all_results = []
 
     for map_name, label_map in config["label_maps"].items():
@@ -118,7 +109,6 @@ def loso_pipeline(config, excel_out="loso_results_psd_data.xlsx"):
         all_results.extend(results)
         print(f"Done with LOSO for {map_name}.")
 
-    # Save to Excel
     df = pd.DataFrame(all_results)
     df.to_excel(excel_out, index=False)
     print(f"\n✅ Results saved to {excel_out}")

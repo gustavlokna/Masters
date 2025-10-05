@@ -6,10 +6,10 @@ from datapreprocessing.memd_filtering import apply_memd_pipeline
 from datapreprocessing.psd_filtering import apply_psd_pipeline
 from datapreprocessing.oldTrash import test_memd_on_segment, edf_to_csv
 from utilities.dataExploration import export_imf_metadata_detailed, plot_imfs_for_segments
-from train.loso_cnn import loso_pipeline 
+from Dream2025.src.train.loso_psd import loso_pipeline 
 from datapreprocessing.csp_filtering import run_csp_extraction
 from train.knn import knn_validation
-from train.loso_psd import loso_psd_pipeline
+from Dream2025.src.train.loso_csp import loso_psd_pipeline
 def main(args: argparse.Namespace) -> None:
     """
     Main function for the ML Piple
