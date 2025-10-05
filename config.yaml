@@ -1,7 +1,7 @@
 data:
   raw: Data/raw/  
   processed: Data/processed
-  preprocessed: "Data/processed/segmented_10s_epoch_125hz.npz" # Combined preprocessed data from all subjects
+  preprocessed: "Data/processed/data_segments_all_channels_combined_2_5secondepoch.npz" # Combined preprocessed data from all subjects
   memd: "Data/processed/data_segments_MEMD_filtered_24_512_dir_sep_Padding.npz" # Combined MEMD filtered data from all subjects
   psd: Data/processed/data_segments_PSD_features.npz # Combined PSD features from all subjects
   csp: Data/processed/CSP_hz_125_epoch_10s_singleband.npz # Combined CSP features from all subjects
