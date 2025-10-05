@@ -64,8 +64,9 @@ def apply_psd_pipeline(config: dict) -> None:
     """Run full PSD pipeline: load, compute, save."""
     input_path = config["data"]["preprocessed"]  # use preprocessed data
     output_path = config["data"]["psd"]
+    fs_config = config["data"]["fs"]
     bands = config["psd_bands"]
 
     X, y, subject, sex = load_data(input_path)
-    X_psd, band_names = compute_psd_features(X, bands, fs=256)
+    X_psd, band_names = compute_psd_features(X, bands, fs=fs_config)
     save_psd_data(output_path, X_psd, y, subject, sex, band_names)
