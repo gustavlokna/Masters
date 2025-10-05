@@ -5,6 +5,7 @@ from datapreprocessing.preprocessing import preprocessing
 from datapreprocessing.memd_filtering import apply_memd_pipeline
 from datapreprocessing.psd_filtering import apply_psd_pipeline
 from datapreprocessing.csp_filtering import run_csp_extraction
+from train.loso_mlp import loso_mlp
 
 def main(args: argparse.Namespace) -> None:
     """
@@ -54,12 +55,12 @@ def main(args: argparse.Namespace) -> None:
 
     elif args.train: 
         print("running training")
+        loso_mlp(config)
         
     
     elif args.dev: 
         print("development mode")
-
-        
+    
     else:
         print("No valid arguments provided. Use --help for usage information.")
 
