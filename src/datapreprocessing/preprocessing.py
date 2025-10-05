@@ -3,8 +3,8 @@ import numpy as np
 import os
 import mne
 from scipy.stats import kurtosis, zscore
-from scipy.signal import welch, hamming
-
+from scipy.signal import welch
+from scipy.signal.windows import hamming
 
 def detect_bad_channels(data, sfreq):
     threshold_prob = 5
