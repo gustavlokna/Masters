@@ -9,13 +9,8 @@ data:
   fs: 256  # Target sampling frequency after downsampling
   epoch_length: 2.5 # Length of each epoch in seconds
 
-model:
-  output_dir: trained_models
-  detector_type: linreg
 
 output:
-  correlation_matrix: Output/correlation_matrix
-  eval: Output/eval
   imf_metadata_csv: Data/exploration/imf_metadata.csv # Detailed IMF metadata for all channels
   imf_metadata_excel: Data/exploration/imf_metadata.xlsx # Detailed IMF metadata for all channels in Excel format
   imf_plot_root: Data/exploration/imf_plots
@@ -50,6 +45,12 @@ exclude_segments: [
   12422, 12427, 12428
 ]
 
+# Configs for imf mixing
+mixing: 
+  n_imfs: 4,            # number of IMFs to combine
+  n_new: 10000,         # number of synthetic samples
+  filter_on_sex: False  # whether to enforce same sex across IMFs
+
 
 psd_bands:
   delta: [0.5, 4]
@@ -76,3 +77,6 @@ label_maps:
   #1_vs_2: {0: null, 1: 0, 2: 1}
   #0_vs_1and2: {0: 0, 1: 1, 2: 1}
   #0and1_vs_2: {0: 0, 1: 0, 2: 1}
+
+
+  

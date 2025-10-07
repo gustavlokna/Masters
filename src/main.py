@@ -5,6 +5,7 @@ from datapreprocessing.preprocessing import preprocessing
 from datapreprocessing.memd_filtering import apply_memd_pipeline
 from datapreprocessing.psd_filtering import apply_psd_pipeline
 from datapreprocessing.csp_filtering import run_csp_extraction
+from datapreprocessing.syntetic_imf import imf_mixing_pipeline
 
 def main(args: argparse.Namespace) -> None:
     """
@@ -43,6 +44,11 @@ def main(args: argparse.Namespace) -> None:
     elif args.memd:
         print("running memd filtering")
         apply_memd_pipeline(config)
+
+    elif args.imf_mixing:
+        print("running imf mixing")
+        imf_mixing_pipeline(config)
+        
     elif args.csp:
         print("running csp feature extraction")
         run_csp_extraction(config)
@@ -54,10 +60,8 @@ def main(args: argparse.Namespace) -> None:
     elif args.train: 
         print("running training")
         
-    
     elif args.dev: 
         print("development mode")
-
         
     else:
         print("No valid arguments provided. Use --help for usage information.")
@@ -87,6 +91,12 @@ def parse_arguments() -> argparse.Namespace:
         action="store_true",
         help="Enable memd filtering on preprocessed data",
     )
+    parser.add_argument(
+        "--imf_mixing",
+        action="store_true",
+        help="Enable syntetic imf mixing on memd filtered data",
+    )
+    
     parser.add_argument(
         "--psd",
         action="store_true",

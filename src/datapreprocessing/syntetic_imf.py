@@ -19,16 +19,7 @@ def save_mixed_data(output_path, X, y, subject, sex, synthetic_flag):
     print(f"Saved mixed data to {output_path} with shape {X.shape}")
 
 
-def mix_imfs_channel_consistent(X, y, subject, sex, n_imfs=4, n_new=10000, filter_on_sex=False):
-    """
-    X: (n_segments, n_imfs, samples, channels)
-    y: (n_segments,)
-    subject: (n_segments,)
-    sex: (n_segments,)
-    n_imfs: number of IMFs to mix
-    n_new: number of synthetic samples
-    filter_on_sex: enforce same sex across IMFs
-    """
+def mix_imfs_channel_consistent(X, y, subject, sex, n_imfs=5, n_new=10000, filter_on_sex=False):
     new_X, new_y, new_subject, new_sex, synthetic_flag = [], [], [], [], []
 
     n_segments, max_imfs, samples, channels = X.shape
@@ -47,19 +38,15 @@ def mix_imfs_channel_consistent(X, y, subject, sex, n_imfs=4, n_new=10000, filte
             groups.setdefault(key, []).append(i)
 
     for _ in range(n_new):
-        # pick one label (and sex) group
         key = random.choice(list(groups.keys()))
         candidates = groups[key]
 
-        # select different segments for each IMF index
         chosen_idx = random.sample(candidates, n_imfs)
-
-        # collect selected IMFs (still keeping IMF axis for now)
         mixed = []
         for j, idx in enumerate(chosen_idx):
-            mixed.append(X[idx, j, :, :])  # IMF j (samples, channels)
+            mixed.append(X[idx, j, :, :])
 
-        mixed = np.stack(mixed, axis=0)  # (n_imfs, samples, channels)
+        mixed = np.stack(mixed, axis=0)
 
         new_X.append(mixed[np.newaxis, :, :, :])
         new_y.append(y[chosen_idx[0]])
@@ -68,16 +55,19 @@ def mix_imfs_channel_consistent(X, y, subject, sex, n_imfs=4, n_new=10000, filte
         else:
             vals, counts = np.unique(sex[chosen_idx], return_counts=True)
             new_sex.append(vals[np.argmax(counts)])
-        new_subject.append(-1)
+        # instead of -1, tag with subjects used
+        subj_ids = [str(subject[idx]) for idx in chosen_idx]
+        new_subject.append(",".join(subj_ids))  # e.g. "s01,s07,s12,s15"
         synthetic_flag.append(1)
 
     return (
-        np.concatenate(new_X, axis=0),  # (n_new, n_imfs, samples, channels)
+        np.concatenate(new_X, axis=0),
         np.array(new_y),
-        np.array(new_subject),
+        np.array(new_subject),   # now strings of subjects
         np.array(new_sex),
         np.array(synthetic_flag),
     )
+
 
 
 def imf_mixing_pipeline(config: dict):
