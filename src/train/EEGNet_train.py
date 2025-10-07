@@ -3,7 +3,7 @@ import tensorflow as tf
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.utils import to_categorical
 from sklearn.metrics import classification_report
-from EEGModels import EEGNet
+from utilities.EEGNet import EEGNet
 
 # --- GPU setup ---
 gpus = tf.config.list_physical_devices('GPU')
