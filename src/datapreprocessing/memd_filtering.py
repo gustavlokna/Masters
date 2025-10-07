@@ -22,8 +22,6 @@ def memd_filter_segment_args(args):
                 memd_params["stop_args"])  # (n_imfs, channels, samples)
     return imfs.transpose(0, 2, 1)  # → (n_imfs, samples, channels)
 
-
-
 def apply_memd_filter(X, memd_params):
     all_imfs = []
     tmp_results = []
