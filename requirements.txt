@@ -9,4 +9,4 @@ matplotlib>=2.2.3
 xgboost
 openpyxl
 pyriemann>=0.2.5   # optional: only if using Riemannian pipelines
-deepexplain        # optional: only if using EEGNet feature relevance
+#deepexplain        # optional: only if using EEGNet feature relevance
