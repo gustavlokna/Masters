@@ -20,9 +20,10 @@ else:
 
 def load_eeg_data(npz_path):
     data = np.load(npz_path, allow_pickle=True)
-    X, y, subject = data["X"], data["y"], data["subject"]
-    print(f"Loaded EEG data: X={X.shape}, y={y.shape}")
-    return X, y, subject
+    X, y, subject, sex = data["X"], data["y"], data["subject"], data["sex"]
+    print(f"Loaded EEG data: X={X.shape}, y={y.shape}, sex={sex.shape}")
+    return X, y, subject, sex
+
 
 
 def prepare_for_eegnet(X, y):
@@ -68,7 +69,7 @@ def run_eegnet(X, Y, n_classes, epochs=50, batch_size=32):
 
 
 def run_eegnet_pipeline(config):
-    X, y, subject = load_eeg_data(config["data"]["npz"])
+    X, y, subject, sex = load_eeg_data(config["data"]["preprocessed"])
 
     for map_name, label_map in config["label_maps"].items():
         print(f"\n=== Running label map: {map_name} ===")

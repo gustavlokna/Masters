@@ -1,7 +1,7 @@
 data:
   raw: Data/raw/  
   processed: Data/processed
-  preprocessed: "Data/processed/data_segments_all_channels_combined_2_5secondepoch.npz" # Combined preprocessed data from all subjects
+  preprocessed: "Data/processed/segmented_2.5s_epoch_128hz.npz" # Combined preprocessed data from all subjects
   fs: 128  # From paper https://github.com/vlawhern/arl-eegmodels/blob/master/EEGModels.py
   epoch_length: 2.5 # Length of each epoch in seconds
 
