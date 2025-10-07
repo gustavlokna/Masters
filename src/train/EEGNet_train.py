@@ -89,6 +89,6 @@ def run_eegnet_pipeline(config):
         # Train + evaluate
         run_eegnet(
             X_ready, Y_ready, n_classes,
-            epochs=50,
-            batch_size=32
+            epochs=300,
+            batch_size=64
         )
