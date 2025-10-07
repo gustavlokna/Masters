@@ -2,7 +2,7 @@ import argparse
 from typing import Any
 from utilities.config import read_config
 from datapreprocessing.preprocessing import preprocessing
-
+from train.EEGNet_train import run_eegnet_pipeline
 
 def main(args: argparse.Namespace) -> None:
     """
@@ -45,7 +45,7 @@ def main(args: argparse.Namespace) -> None:
         
     elif args.dev: 
         print("development mode")
-        
+        run_eegnet_pipeline(config)
     else:
         print("No valid arguments provided. Use --help for usage information.")
 
