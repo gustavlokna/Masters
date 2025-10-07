@@ -2,9 +2,11 @@ numpy
 pandas
 scipy
 pyyaml
-mne
-scikit-learn
-torch
-openpyxl
+mne>=0.17.1
+scikit-learn>=0.20.1
+tensorflow>=2.0,<2.4
+matplotlib>=2.2.3
 xgboost
-tensorflow
+openpyxl
+pyriemann>=0.2.5   # optional: only if using Riemannian pipelines
+deepexplain        # optional: only if using EEGNet feature relevance
