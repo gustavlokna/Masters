@@ -78,7 +78,6 @@ def leave_one_subject_out_pipeline(config, output_excel="Marta_loso_results.xlsx
 
         # Leave-One-Subject-Out evaluation
         subjects = np.unique(subj_filtered)
-        subject_results = []
 
         for subj in subjects:
             train_mask = subj_filtered != subj
@@ -96,8 +95,12 @@ def leave_one_subject_out_pipeline(config, output_excel="Marta_loso_results.xlsx
             internal_acc, internal_recall, internal_kappa = evaluate_model(model, scaler, X_te, y_te)
             excl_acc, excl_recall, excl_kappa = evaluate_model(model, scaler, X_val_subj, y_val_subj)
 
-            subject_results.append({
+            all_results.append({
+                "label_map": map_name,
                 "subject": subj,
+                "baseline_acc": base_acc,
+                "baseline_recall": base_recall,
+                "baseline_kappa": base_kappa,
                 "internal_acc": internal_acc,
                 "internal_recall": internal_recall,
                 "internal_kappa": internal_kappa,
@@ -108,27 +111,6 @@ def leave_one_subject_out_pipeline(config, output_excel="Marta_loso_results.xlsx
 
             print(f"Subject {subj}: internal_acc={internal_acc:.4f}, excluded_acc={excl_acc:.4f}")
 
-        df_results = pd.DataFrame(subject_results)
-        print("\n=== Leave-One-Subject-Out Summary ===")
-        print(df_results)
-
-        mean_internal = df_results[["internal_acc", "internal_recall", "internal_kappa"]].mean()
-        mean_excluded = df_results[["excluded_acc", "excluded_recall", "excluded_kappa"]].mean()
-
-        all_results.append({
-            "label_map": map_name,
-            "baseline_acc": base_acc,
-            "baseline_recall": base_recall,
-            "baseline_kappa": base_kappa,
-            "mean_internal_acc": mean_internal["internal_acc"],
-            "mean_internal_recall": mean_internal["internal_recall"],
-            "mean_internal_kappa": mean_internal["internal_kappa"],
-            "mean_excluded_acc": mean_excluded["excluded_acc"],
-            "mean_excluded_recall": mean_excluded["excluded_recall"],
-            "mean_excluded_kappa": mean_excluded["excluded_kappa"],
-        })
-
-    # Save to Excel
-    df_all = pd.DataFrame(all_results)
-    df_all.to_excel(output_excel, index=False)
+    df_results = pd.DataFrame(all_results)
+    df_results.to_excel(output_excel, index=False)
     print(f"\nResults saved to {output_excel}")
