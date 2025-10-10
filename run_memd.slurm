@@ -1,14 +1,14 @@
 #!/bin/bash
 #SBATCH --account=share-ie-idi
-#SBATCH --job-name=memd_all        # ✅ Job name  
+#SBATCH --job-name=eegNet_Channel_reduction        # ✅ Job name  
 #SBATCH --time=90:00:00
 
 #SBATCH --partition=GPUQ
 #SBATCH --gres=gpu:1
 #SBATCH --mem=600G
 #SBATCH --nodes=1
-#SBATCH --output=memd.txt         # ✅ Output file
-#SBATCH --error=memd.txt          # ✅ Error file
+#SBATCH --output=eeg_channel_reduction_out.txt         # ✅ Output file
+#SBATCH --error=eeg_channel_reduction_err.txt          # ✅ Error file
 
 #SBATCH --mail-user=gustal@stud.ntnu.no
 #SBATCH --mail-type=ALL
@@ -27,4 +27,4 @@ module load Anaconda3/2023.09-0
 source ~/.bashrc
 conda activate dream_env
 
-python src/main.py --memd
+python src/main.py --dev
