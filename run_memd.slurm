@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --account=share-ie-idi
-#SBATCH --job-name=memd        # ✅ Job name  
+#SBATCH --job-name=memd_all        # ✅ Job name  
 #SBATCH --time=90:00:00
 
 #SBATCH --partition=GPUQ
