@@ -7,17 +7,16 @@ from tensorflow.keras.optimizers import Adam
 from  utilities.EEGNet import EEGNet
 
 
-def load_psd_data(npz_path, config):
+def load_raw_data(npz_path, config):
     data = np.load(npz_path, allow_pickle=True)
-    X, y, subject, bands, sex = data["X"], data["y"], data["subject"], data["bands"], data["sex"]
-    print(f"Loaded PSD data: X={X.shape}, y={y.shape}")
+    X, y, subject, sex = data["X"], data["y"], data["subject"], data["sex"]
+    print(f"Loaded RAW data: X={X.shape}, y={y.shape}")
 
-    # Optional channel downsampling (comment out if not wanted)
     selected = np.array(config["channels"]["top_64"]) - 1
-    X = X[:, :, selected]  # channels are last dimension
-    # print(f"Downsampled to {len(selected)} channels")
+    X = X[:, selected, :]  # shape: (epochs, channels, samples)
 
-    return X, y, subject, bands, sex
+    return X, y, subject, sex
+
 
 
 def prepare_data(X, y, label_map):
@@ -46,8 +45,8 @@ def evaluate_model(model, X_test, y_test):
     return acc, recall, kappa
 
 
-def eeg_loso(config, output_excel="EEGNet_loso_results.xlsx"):
-    X, y, subject, band_names, sex = load_psd_data(config["data"]["psd"], config)
+def eeg_loso(config, output_excel="EEGNet_loso_raw_channel_reduction_results.xlsx"):
+    X, y, subject, sex = load_raw_data(config["data"]["psd"], config)
     all_results = []
 
     for map_name, label_map in config["label_maps"].items():
