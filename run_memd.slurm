@@ -1,14 +1,14 @@
 #!/bin/bash
 #SBATCH --account=share-ie-idi
-#SBATCH --job-name=subject_imp        # ✅ Job name  
+#SBATCH --job-name=subject_imp_complete        # ✅ Job name  
 #SBATCH --time=30:00:00
 
 #SBATCH --partition=GPUQ
 #SBATCH --gres=gpu:1
 #SBATCH --mem=300G
 #SBATCH --nodes=1
-#SBATCH --output=subject_imp_out.txt         # ✅ Output file
-#SBATCH --error=subject_imp_err.txt          # ✅ Error file
+#SBATCH --output=subject_imp_2_out.txt         # ✅ Output file
+#SBATCH --error=subject_imp_2_err.txt          # ✅ Error file
 
 #SBATCH --mail-user=gustal@stud.ntnu.no
 #SBATCH --mail-type=ALL
