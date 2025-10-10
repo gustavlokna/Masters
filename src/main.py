@@ -5,7 +5,7 @@ from datapreprocessing.preprocessing import preprocessing
 from datapreprocessing.memd_filtering import apply_memd_pipeline
 from datapreprocessing.psd_filtering import apply_psd_pipeline
 from datapreprocessing.syntetic_imf import imf_mixing_pipeline
-from train.subject_importance import subject_importance
+from train.subject_importance import leave_one_subject_out_pipeline
 
 def main(args: argparse.Namespace) -> None:
     """
@@ -55,7 +55,7 @@ def main(args: argparse.Namespace) -> None:
 
     elif args.train: 
         print("running training")
-        subject_importance(config)
+        leave_one_subject_out_pipeline(config)
         
     elif args.dev: 
         print("development mode")
