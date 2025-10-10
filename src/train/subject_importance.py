@@ -41,7 +41,8 @@ def train_and_evaluate(X, y, band_names, test_size=0.3, random_state=42):
         learning_rate=0.1,
         objective='binary:logistic', 
         eval_metric='logloss',
-        use_label_encoder=False, random_state=42,
+        use_label_encoder=False, 
+        random_state=42,
         tree_method='hist', 
         device='cuda'
     )
@@ -54,25 +55,11 @@ def train_and_evaluate(X, y, band_names, test_size=0.3, random_state=42):
 
     # Feature importance
     
-    importances = model.feature_importances_
-    n_bands = len(band_names)
-    importance_table = []
-    for idx, imp in enumerate(importances):
-        ch_idx = idx // n_bands
-        band_idx = idx % n_bands
-        importance_table.append({
-            "channel_idx": ch_idx,
-            "band_name": band_names[band_idx],
-            "importance": imp
-        })
-    importance_df = pd.DataFrame(importance_table).sort_values("importance", ascending=False)
-    print("\nTop 20 features:")
-    print(importance_df.head(20).to_string(index=False))
 
-    return model, importance_df
+    return model
 
 
-def run_training_pipeline(config):
+def subject_importance(config):
     """Main entry point for training pipeline."""
     X, y, subject, band_names, sex = load_psd_data(config["data"]["psd"])
 
@@ -84,7 +71,4 @@ def run_training_pipeline(config):
             print(f"Skipping {map_name} (not enough classes).")
             continue
 
-        _, importance_df = train_and_evaluate(X_filtered, y_filtered, band_names)
-        out_path = f"{config['output']['importance_root']}/importance_{map_name}.csv"
-        importance_df.to_csv(out_path, index=False)
-        print(f"Saved feature importance to {out_path}")
+        train_and_evaluate(X_filtered, y_filtered, band_names)

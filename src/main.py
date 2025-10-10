@@ -4,8 +4,8 @@ from utilities.config import read_config
 from datapreprocessing.preprocessing import preprocessing
 from datapreprocessing.memd_filtering import apply_memd_pipeline
 from datapreprocessing.psd_filtering import apply_psd_pipeline
-from datapreprocessing.csp_filtering import run_csp_extraction
 from datapreprocessing.syntetic_imf import imf_mixing_pipeline
+from train.subject_importance import subject_importance
 
 def main(args: argparse.Namespace) -> None:
     """
@@ -48,10 +48,6 @@ def main(args: argparse.Namespace) -> None:
     elif args.imf_mixing:
         print("running imf mixing")
         imf_mixing_pipeline(config)
-        
-    elif args.csp:
-        print("running csp feature extraction")
-        run_csp_extraction(config)
 
     elif args.psd:
         print("running psd feature extraction")
@@ -59,6 +55,7 @@ def main(args: argparse.Namespace) -> None:
 
     elif args.train: 
         print("running training")
+        subject_importance(config)
         
     elif args.dev: 
         print("development mode")
