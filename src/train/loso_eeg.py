@@ -46,7 +46,7 @@ def evaluate_model(model, X_test, y_test):
 
 
 def eeg_loso(config, output_excel="EEGNet_loso_raw_channel_reduction_results.xlsx"):
-    X, y, subject, sex = load_raw_data(config["data"]["psd"], config)
+    X, y, subject, sex = load_raw_data(config["data"]["preprocessed"], config)
     all_results = []
 
     for map_name, label_map in config["label_maps"].items():
