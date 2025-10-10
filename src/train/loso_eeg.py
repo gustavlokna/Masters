@@ -4,7 +4,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, recall_score, cohen_kappa_score, classification_report
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.optimizers import Adam
-from EEGModels import EEGNet  # import from ARL EEGModels
+from  utilities.EEGNet import EEGNet
 
 
 def load_psd_data(npz_path, config):
