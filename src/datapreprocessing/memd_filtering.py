@@ -62,8 +62,8 @@ def apply_memd_pipeline(config: dict) -> None:
     memd_params = config["memd_params"]
 
     X, y, subject, sex = load_data(input_path)  
-    selected = np.array(config["channels"]["top_64"]) -1
+    selected = np.array(config["channels"]["top_64"]) - 1
+    X = X[:, :, selected]
     
-    X = X[:, selected, :]  # shape: (epochs, channels, samples)
     X_filtered = apply_memd_filter(X, memd_params)
     save_filtered_data(output_path, X_filtered, y, subject, sex)
