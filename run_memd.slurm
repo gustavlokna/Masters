@@ -1,14 +1,14 @@
 #!/bin/bash
 #SBATCH --account=share-ie-idi
-#SBATCH --job-name=memd_top64Channels       # ✅ Job name  
+#SBATCH --job-name=memd_top40Channels       # ✅ Job name  
 #SBATCH --time=90:00:00
 
 #SBATCH --partition=GPUQ
 #SBATCH --gres=gpu:1
 #SBATCH --mem=600G
 #SBATCH --nodes=1
-#SBATCH --output=memd_top64Channels.txt         # ✅ Output file
-#SBATCH --error=memd_top64Channels.txt          # ✅ Error file
+#SBATCH --output=memd_top40Channels.txt         # ✅ Output file
+#SBATCH --error=memd_top40Channels.txt          # ✅ Error file
 
 #SBATCH --mail-user=gustal@stud.ntnu.no
 #SBATCH --mail-type=ALL
