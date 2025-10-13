@@ -5,6 +5,8 @@ from sklearn.metrics import accuracy_score, recall_score, cohen_kappa_score, cla
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.optimizers import Adam
 from  utilities.EEGNet import EEGNet
+# Upsample minority class in training set
+from sklearn.utils import resample
 
 
 def load_raw_data(npz_path, config):
@@ -25,12 +27,28 @@ def prepare_data(X, y, label_map):
     y_filtered = np.array([label_map[lbl] for lbl in y[mask]], dtype=int)
     return X_filtered, y_filtered
 
+def balance_classes(X, y):
+    y_labels = np.argmax(y, axis=1)
+    unique, counts = np.unique(y_labels, return_counts=True)
+    if len(unique) < 2:
+        return X, y
+    max_count = counts.max()
+    X_balanced, y_balanced = [], []
+    for cls in unique:
+        X_cls = X[y_labels == cls]
+        y_cls = y[y_labels == cls]
+        X_res, y_res = resample(X_cls, y_cls, replace=True, n_samples=max_count, random_state=42)
+        X_balanced.append(X_res)
+        y_balanced.append(y_res)
+    return np.vstack(X_balanced), np.vstack(y_balanced)
+
+
 
 def train_eegnet(X_train, y_train, nb_classes):
     chans, samples = X_train.shape[1], X_train.shape[2]
     model = EEGNet(nb_classes=nb_classes, Chans=chans, Samples=samples, dropoutRate=0.5)
     model.compile(loss='categorical_crossentropy', optimizer=Adam(learning_rate=1e-3), metrics=['accuracy'])
-    model.fit(X_train, y_train, epochs=50, batch_size=32, verbose=0)
+    model.fit(X_train, y_train, epochs=500, batch_size=32, verbose=0)
     return model
 
 
@@ -69,6 +87,7 @@ def eeg_loso(config, output_excel="EEGNet_loso_raw_channel_reduction_results.xls
         X_train, X_test, y_train, y_test = train_test_split(
             X_filtered, y_cat, test_size=0.3, stratify=y_filtered, random_state=42
         )
+
         print("\n=== Baseline EEGNet (70/30 Split) ===")
         model = train_eegnet(X_train, y_train, nb_classes)
         base_acc, base_recall, base_kappa = evaluate_model(model, X_test, y_test)
@@ -88,6 +107,7 @@ def eeg_loso(config, output_excel="EEGNet_loso_raw_channel_reduction_results.xls
                 X_train_subj, y_train_subj, test_size=0.3,
                 stratify=np.argmax(y_train_subj, axis=1), random_state=42
             )
+            X_tr, y_tr = balance_classes(X_tr, y_tr)
 
             model = train_eegnet(X_tr, y_tr, nb_classes)
             internal_acc, internal_recall, internal_kappa = evaluate_model(model, X_te, y_te)
