@@ -15,6 +15,7 @@ def preprocessing(config: dict) -> None:
     all_y = []
     all_subjects = []
     all_sexes = []
+    all_ages = []
 
     # Load metadata
     records_path = os.path.join(
@@ -86,23 +87,25 @@ def preprocessing(config: dict) -> None:
                 raise RuntimeError(f"❌ No metadata found for file: {fname}")
             label = meta.iloc[0]["Experience"]
             sex = meta.iloc[0]["Subject sex"]  # 0=female, 1=male
-
+            age = meta.iloc[0]["Subject age"]   
             y = np.full((num_segments,), label)
+            
             sex_array = np.full((num_segments,), sex)
             subject_array = np.full((num_segments,), subject_id)
-
+            age_array = np.full((num_segments,), age)
             # Append to lists
             all_X.append(X)
             all_y.append(y)
             all_subjects.append(subject_array)
             all_sexes.append(sex_array)
+            all_ages.append(age_array)
 
     # Concatenate all subjects
     X_all = np.concatenate(all_X, axis=0)
     y_all = np.concatenate(all_y, axis=0)
     subject_all = np.concatenate(all_subjects, axis=0)
     sex_all = np.concatenate(all_sexes, axis=0)
-
+    age_all = np.concatenate(all_ages, axis=0)
     # Save data
     outpath = os.path.join(
         config["data"]["processed"],
@@ -114,7 +117,8 @@ def preprocessing(config: dict) -> None:
         X=X_all,
         y=y_all,
         subject=subject_all,
-        sex=sex_all
+        sex=sex_all,
+        age=age_all
     )
 
     print(f"Saved combined data: {outpath} with shape {X_all.shape}")

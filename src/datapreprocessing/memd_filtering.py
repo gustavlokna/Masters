@@ -7,7 +7,7 @@ from utilities.memd import memd
 def load_data(npz_path):
     ## Load preprocessed data from .npz file.
     data = np.load(npz_path); 
-    return data["X"], data["y"], data["subject"], data["sex"]
+    return data["X"], data["y"], data["subject"], data["sex"], data["age"]
 
 def save_filtered_data(output_path, X_filtered, y, subject, sex):
     np.savez(output_path, X=X_filtered, y=y, subject=subject, sex=sex)
@@ -61,9 +61,9 @@ def apply_memd_pipeline(config: dict) -> None:
     output_path = config["data"]["memd"]
     memd_params = config["memd_params"]
 
-    X, y, subject, sex = load_data(input_path)  
+    X, y, subject, sex, age = load_data(input_path)  
     selected = np.array(config["channels"]["top_20"]) - 1
     X = X[:, :, selected]
 
     X_filtered = apply_memd_filter(X, memd_params)
-    save_filtered_data(output_path, X_filtered, y, subject, sex)
+    save_filtered_data(output_path, X_filtered, y, subject, sex, age)
