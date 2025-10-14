@@ -2,7 +2,7 @@ data:
   raw: Data/raw/  
   processed: Data/processed
   preprocessed: "Data/processed/segmented_2.5s_epoch_256hz.npz" # Combined preprocessed data from all subjects
-  memd: "Data/processed/memd_segmented_2.5s_epoch_256hz_ALLCHANNELS_64_dir.npz" # Combined MEMD filtered data from all subjects
+  memd: "Data/processed/memd_segmented_2.5s_epoch_256hz_ALLCHANNELS_512_dir.npz" # Combined MEMD filtered data from all subjects
   psd: Data/processed/PSD_segmented_2.5s_epoch_256hz.npz # Combined PSD features from all subjects
   fs: 256  # Target sampling frequency after downsampling
   epoch_length: 2.5 # Length of each epoch in seconds
@@ -19,7 +19,7 @@ channels:
   top_20: [6, 8, 44, 66, 79, 102, 103, 111, 144, 155, 199, 208, 219, 229, 232, 233, 237, 248, 251, 256]
 
 memd_params:
-  num_directions: 64 # can try 64 or 512 as found in file job2_5 file from Adian Belsics masters
+  num_directions: 512 # can try 64 or 512 as found in file job2_5 file from Adian Belsics masters
   stop_criteria: "stop" 
   stop_args: [0.075, 0.75, 0.075]
   keep_imfs: 4   # new param
