@@ -1,14 +1,14 @@
 #!/bin/bash
 #SBATCH --account=share-ie-idi
-#SBATCH --job-name=added_features_models       # ✅ Job name  
+#SBATCH --job-name=MLP_Class_Balance       # ✅ Job name  
 #SBATCH --time=240:00:00
 
 #SBATCH --partition=GPUQ
 #SBATCH --gres=gpu:1
 #SBATCH --mem=600G
 #SBATCH --nodes=1
-#SBATCH --output=added_features_models_out.txt         # ✅ Output file
-#SBATCH --error=added_features_models_err.txt          # ✅ Error file
+#SBATCH --output=MLP_Class_Balance_out.txt         # ✅ Output file
+#SBATCH --error=MLP_Class_Balance_err.txt          # ✅ Error file
 
 #SBATCH --mail-user=gustal@stud.ntnu.no
 #SBATCH --mail-type=ALL

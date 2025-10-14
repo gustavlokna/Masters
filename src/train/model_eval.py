@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from sklearn.utils import resample
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score, recall_score, cohen_kappa_score, classification_report
@@ -19,7 +20,7 @@ def model_mlp(input_dim, X_train, y_train, X_test):
     model.add(Dense(8, activation='relu'))
     model.add(Dense(1, activation='sigmoid'))
     model.compile(optimizer=Adam(), loss='binary_crossentropy', metrics=['accuracy'])
-    model.fit(X_train, y_train, epochs=300, batch_size=32, verbose=0)
+    model.fit(X_train, y_train, epochs=500, batch_size=32, verbose=0)
     return (model.predict(X_test) > 0.5).astype(int).flatten()
 
 
@@ -115,13 +116,61 @@ def add_sex_age_features(X, sex, age):
     X_out = np.concatenate((X, sex_expanded, age_expanded), axis=2)
     return X_out
 
+def balance_train_classes(X_train, y_train):
+    """
+    Balance class distribution in the training set by upsampling the minority class.
 
-def models_eval(config, output_excel="added_features.xlsx"):
+    Parameters
+    ----------
+    X_train : array-like, shape (n_samples, n_features)
+        Feature matrix for the training data.
+    y_train : array-like, shape (n_samples,)
+        Labels corresponding to X_train.
+
+    Returns
+    -------
+    X_balanced : ndarray, shape (n_samples_balanced, n_features)
+        Training feature matrix with balanced class representation.
+    y_balanced : ndarray, shape (n_samples_balanced,)
+        Labels corresponding to X_balanced with equal class counts.
+
+    Notes
+    -----
+    - The function identifies the minority and majority classes in `y_train`.
+    - The minority class is upsampled with replacement until it matches
+      the number of samples in the majority class.
+    - The resulting dataset preserves all majority samples and duplicates
+      minority samples as needed.
+    """
+    X_df = pd.DataFrame(X_train)
+    y_df = pd.Series(y_train, name="label")
+    df = pd.concat([X_df, y_df], axis=1)
+
+    majority_class = df["label"].value_counts().idxmax()
+    minority_class = df["label"].value_counts().idxmin()
+
+    df_majority = df[df["label"] == majority_class]
+    df_minority = df[df["label"] == minority_class]
+
+    df_minority_upsampled = resample(
+        df_minority,
+        replace=True,
+        n_samples=len(df_majority),
+        random_state=42
+    )
+
+    df_balanced = pd.concat([df_majority, df_minority_upsampled])
+    X_balanced = df_balanced.drop(columns=["label"]).values
+    y_balanced = df_balanced["label"].values
+
+    return X_balanced, y_balanced
+
+def models_eval(config, output_excel="MLP_Class_Balance.xlsx"):
     X, y, subject, band_names, sex ,age= load_psd_data(config["data"]["psd"])
-    X = add_sex_age_features(X, sex, age) 
+    #X = add_sex_age_features(X, sex, age) 
     all_results = []
      #["MLP", "KNN", "SVC", "LogisticRegression", "RandomForest", "XGBoost"]
-    model_types = ["KNN", "LogisticRegression", "RandomForest", "XGBoost"]
+    model_types = ["MLP"]#["KNN", "LogisticRegression", "RandomForest", "XGBoost"]
 
     for map_name, label_map in config["label_maps"].items():
         print(f"\n=== Running label map: {map_name} ===")
@@ -135,6 +184,7 @@ def models_eval(config, output_excel="added_features.xlsx"):
         X_train, X_test, y_train, y_test = train_test_split(
             X_filtered, y_filtered, test_size=0.3, stratify=y_filtered, random_state=42
         )
+        X_train, y_train = balance_train_classes(X_train, y_train)
 
         for model_type in model_types:
             print(f"\n=== {model_type} Baseline Model (70/30 Split) ===")
