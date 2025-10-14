@@ -72,4 +72,5 @@ def apply_psd_pipeline(config: dict) -> None:
 
     X, y, subject, sex , age= load_data(input_path)
     X_psd, band_names = compute_psd_features(X, bands,fs) # shape (n_epochs, n_bands, n_channels)
+    print(f"Computed PSD features with shape {X_psd.shape}")
     save_psd_data(output_path, X_psd, y, subject, sex,age,  band_names)
