@@ -94,7 +94,7 @@ def models_eval(config, output_excel="Marta_loso_results.xlsx"):
     X, y, subject, band_names, sex = load_psd_data(config["data"]["psd"])
     all_results = []
 
-    model_types = ["MLP", "KNN", "SVC", "LogisticRegression", "RandomForest", "XGBoost"]
+    model_types = ["MLP"]#["MLP", "KNN", "SVC", "LogisticRegression", "RandomForest", "XGBoost"]
 
     for map_name, label_map in config["label_maps"].items():
         print(f"\n=== Running label map: {map_name} ===")
