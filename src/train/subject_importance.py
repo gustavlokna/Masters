@@ -13,9 +13,8 @@ import xgboost as xgb
 
 def load_psd_data(npz_path):
     data = np.load(npz_path, allow_pickle=True)
-    X, y, subject, bands, sex = data["X"], data["y"], data["subject"], data["bands"], data["sex"]
-    print(f"Loaded PSD data: X={X.shape}, y={y.shape}, bands={bands}")
-    return X, y, subject, bands, sex
+
+    return data["X"], data["y"], data["subject"], data["bands"], data["sex"], data["age"]
 
 
 def prepare_data(X, y, label_map):
@@ -55,7 +54,7 @@ def evaluate_model(model, scaler, X_test, y_test):
 
 
 def leave_one_subject_out_pipeline(config, output_excel="Marta_loso_results.xlsx"):
-    X, y, subject, band_names, sex = load_psd_data(config["data"]["psd"])
+    X, y, subject, band_names, sex, age = load_psd_data(config["data"]["psd"])
     all_results = []
 
     for map_name, label_map in config["label_maps"].items():

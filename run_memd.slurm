@@ -1,14 +1,14 @@
 #!/bin/bash
 #SBATCH --account=share-ie-idi
-#SBATCH --job-name=memd_All_channels_512_dir_512_dir       # ✅ Job name  
-#SBATCH --time=240:00:00
+#SBATCH --job-name=mode_eval       # ✅ Job name  
+#SBATCH --time=90:00:00
 
 #SBATCH --partition=GPUQ
 #SBATCH --gres=gpu:1
 #SBATCH --mem=600G
 #SBATCH --nodes=1
-#SBATCH --output=memd_All_channels_512_dir_out.txt         # ✅ Output file
-#SBATCH --error=memd_All_channels_512_dir_err.txt          # ✅ Error file
+#SBATCH --output=mode_eval_out.txt         # ✅ Output file
+#SBATCH --error=mode_eval_err.txt          # ✅ Error file
 
 #SBATCH --mail-user=gustal@stud.ntnu.no
 #SBATCH --mail-type=ALL
@@ -27,4 +27,4 @@ module load Anaconda3/2023.09-0
 source ~/.bashrc
 conda activate dream_env
 
-python src/main.py --memd
+python src/main.py --dev

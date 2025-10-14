@@ -25,9 +25,7 @@ def model_mlp(input_dim, X_train, y_train, X_test):
 
 def load_psd_data(npz_path):
     data = np.load(npz_path, allow_pickle=True)
-    X, y, subject, bands, sex = data["X"], data["y"], data["subject"], data["bands"], data["sex"]
-    print(f"Loaded PSD data: X={X.shape}, y={y.shape}, bands={bands}")
-    return X, y, subject, bands, sex
+    return data["X"], data["y"], data["subject"], data["bands"], data["sex"], data["age"]
 
 
 def prepare_data(X, y, label_map):
@@ -90,11 +88,11 @@ def evaluate_model(model, scaler, X_test, y_test, model_type, X_train=None, y_tr
     return acc, recall, kappa
 
 
-def models_eval(config, output_excel="Marta_loso_results.xlsx"):
-    X, y, subject, band_names, sex = load_psd_data(config["data"]["psd"])
+def models_eval(config, output_excel="mode_eval.xlsx"):
+    X, y, subject, band_names, sex ,age= load_psd_data(config["data"]["psd"])
     all_results = []
 
-    model_types = ["MLP"]#["MLP", "KNN", "SVC", "LogisticRegression", "RandomForest", "XGBoost"]
+    model_types = ["XGBoost"]#["MLP", "KNN", "SVC", "LogisticRegression", "RandomForest", "XGBoost"]
 
     for map_name, label_map in config["label_maps"].items():
         print(f"\n=== Running label map: {map_name} ===")
