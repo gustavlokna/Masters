@@ -1,14 +1,14 @@
 #!/bin/bash
 #SBATCH --account=share-ie-idi
-#SBATCH --job-name=ALL_MODELS_EVAL       # ✅ Job name  
+#SBATCH --job-name=added_features_models       # ✅ Job name  
 #SBATCH --time=240:00:00
 
 #SBATCH --partition=GPUQ
 #SBATCH --gres=gpu:1
 #SBATCH --mem=600G
 #SBATCH --nodes=1
-#SBATCH --output=ALL_MODELS_EVAL_out.txt         # ✅ Output file
-#SBATCH --error=ALL_MODELS_EVAL_err.txt          # ✅ Error file
+#SBATCH --output=added_features_models_out.txt         # ✅ Output file
+#SBATCH --error=added_features_models_err.txt          # ✅ Error file
 
 #SBATCH --mail-user=gustal@stud.ntnu.no
 #SBATCH --mail-type=ALL
