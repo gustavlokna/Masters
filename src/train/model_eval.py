@@ -87,12 +87,41 @@ def evaluate_model(model, scaler, X_test, y_test, model_type, X_train=None, y_tr
     print(classification_report(y_test, preds, zero_division=0))
     return acc, recall, kappa
 
+def add_sex_age_features(X, sex, age):
+    """
+    Add sex and age as extra features to each epoch.
+
+    Parameters
+    ----------
+    X : ndarray, shape (epochs, bands, channels)
+        PSD features.
+    sex : ndarray, shape (epochs,)
+        Binary or categorical sex values (e.g., 0=female, 1=male).
+    age : ndarray, shape (epochs,)
+        Age values per epoch.
+
+    Returns
+    -------
+    X_out : ndarray, shape (epochs, bands, channels + 2)
+        PSD features with sex and age appended as two additional channels.
+    """
+    X = np.asarray(X)
+    sex = np.asarray(sex).reshape(-1, 1, 1)
+    age = np.asarray(age).reshape(-1, 1, 1)
+
+    sex_expanded = np.repeat(sex, X.shape[1], axis=1)   # match number of bands
+    age_expanded = np.repeat(age, X.shape[1], axis=1)
+
+    X_out = np.concatenate((X, sex_expanded, age_expanded), axis=2)
+    return X_out
+
 
 def models_eval(config, output_excel="ALL_MODELS_EVAL.xlsx"):
     X, y, subject, band_names, sex ,age= load_psd_data(config["data"]["psd"])
+    X = add_sex_age_features(X, sex, age) 
     all_results = []
-
-    model_types = ["MLP", "KNN", "SVC", "LogisticRegression", "RandomForest", "XGBoost"]
+     #["MLP", "KNN", "SVC", "LogisticRegression", "RandomForest", "XGBoost"]
+    model_types = ["KNN", "LogisticRegression", "RandomForest", "XGBoost"]
 
     for map_name, label_map in config["label_maps"].items():
         print(f"\n=== Running label map: {map_name} ===")
