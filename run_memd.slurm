@@ -1,14 +1,14 @@
 #!/bin/bash
 #SBATCH --account=share-ie-idi
-#SBATCH --job-name=mode_eval       # ✅ Job name  
+#SBATCH --job-name=MLP       # ✅ Job name  
 #SBATCH --time=90:00:00
 
 #SBATCH --partition=GPUQ
 #SBATCH --gres=gpu:1
 #SBATCH --mem=600G
 #SBATCH --nodes=1
-#SBATCH --output=mode_eval_out.txt         # ✅ Output file
-#SBATCH --error=mode_eval_err.txt          # ✅ Error file
+#SBATCH --output=MLP_out.txt         # ✅ Output file
+#SBATCH --error=MLP_err.txt          # ✅ Error file
 
 #SBATCH --mail-user=gustal@stud.ntnu.no
 #SBATCH --mail-type=ALL

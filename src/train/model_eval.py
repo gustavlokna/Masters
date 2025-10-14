@@ -88,11 +88,11 @@ def evaluate_model(model, scaler, X_test, y_test, model_type, X_train=None, y_tr
     return acc, recall, kappa
 
 
-def models_eval(config, output_excel="mode_eval.xlsx"):
+def models_eval(config, output_excel="MLP_eval.xlsx"):
     X, y, subject, band_names, sex ,age= load_psd_data(config["data"]["psd"])
     all_results = []
 
-    model_types = ["XGBoost"]#["MLP", "KNN", "SVC", "LogisticRegression", "RandomForest", "XGBoost"]
+    model_types = ["MLP"]#["MLP", "KNN", "SVC", "LogisticRegression", "RandomForest", "XGBoost"]
 
     for map_name, label_map in config["label_maps"].items():
         print(f"\n=== Running label map: {map_name} ===")
