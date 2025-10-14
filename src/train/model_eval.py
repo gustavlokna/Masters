@@ -116,7 +116,7 @@ def add_sex_age_features(X, sex, age):
     return X_out
 
 
-def models_eval(config, output_excel="ALL_MODELS_EVAL.xlsx"):
+def models_eval(config, output_excel="added_features.xlsx"):
     X, y, subject, band_names, sex ,age= load_psd_data(config["data"]["psd"])
     X = add_sex_age_features(X, sex, age) 
     all_results = []
