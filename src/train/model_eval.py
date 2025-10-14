@@ -54,7 +54,7 @@ def train_model(model_type, X_train, y_train):
         return "MLP", scaler  # Placeholder (handled separately)
 
     elif model_type == "KNN":
-        model = KNeighborsClassifier(n_neighbors=5)
+        model = KNeighborsClassifier(n_neighbors=10) #was 5
 
     elif model_type == "SVC":
         model = SVC(kernel='rbf', probability=True)
@@ -165,12 +165,12 @@ def balance_train_classes(X_train, y_train):
 
     return X_balanced, y_balanced
 
-def models_eval(config, output_excel="MLP_Class_Balance.xlsx"):
+def models_eval(config, output_excel="all_models_all_labels_with_sex_and_age.xlsx"):
     X, y, subject, band_names, sex ,age= load_psd_data(config["data"]["psd"])
-    #X = add_sex_age_features(X, sex, age) 
+    X = add_sex_age_features(X, sex, age) 
     all_results = []
      #["MLP", "KNN", "SVC", "LogisticRegression", "RandomForest", "XGBoost"]
-    model_types = ["MLP"]#["KNN", "LogisticRegression", "RandomForest", "XGBoost"]
+    model_types = ["MLP", "KNN", "SVC", "LogisticRegression", "RandomForest", "XGBoost"]
 
     for map_name, label_map in config["label_maps"].items():
         print(f"\n=== Running label map: {map_name} ===")
@@ -184,7 +184,7 @@ def models_eval(config, output_excel="MLP_Class_Balance.xlsx"):
         X_train, X_test, y_train, y_test = train_test_split(
             X_filtered, y_filtered, test_size=0.3, stratify=y_filtered, random_state=42
         )
-        X_train, y_train = balance_train_classes(X_train, y_train)
+        #X_train, y_train = balance_train_classes(X_train, y_train)
 
         for model_type in model_types:
             print(f"\n=== {model_type} Baseline Model (70/30 Split) ===")
