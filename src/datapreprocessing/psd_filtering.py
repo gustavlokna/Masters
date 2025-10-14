@@ -1,5 +1,3 @@
-is saving psd data done correctly 
-
 import numpy as np
 from scipy.signal import welch
 
