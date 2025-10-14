@@ -8,7 +8,7 @@ def load_data(npz_path):
     return data["X"], data["y"], data["subject"], data["sex"], data["age"]
 
 def save_psd_data(output_path, X_psd, y, subject, sex, age, band_names):
-    """Save PSD features along with labels, subjects, sex, and band names."""
+    """Save PSD features along with labels, subjects, sex, age and band names."""
     np.savez(
         output_path,
         X=X_psd,
