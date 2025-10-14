@@ -1,14 +1,14 @@
 #!/bin/bash
 #SBATCH --account=share-ie-idi
-#SBATCH --job-name=eegnet128hz       # ✅ Job name  
+#SBATCH --job-name=memd_top20Channels       # ✅ Job name  
 #SBATCH --time=90:00:00
 
 #SBATCH --partition=GPUQ
 #SBATCH --gres=gpu:1
 #SBATCH --mem=600G
 #SBATCH --nodes=1
-#SBATCH --output=eegnet128hz_out.txt         # ✅ Output file
-#SBATCH --error=eegnet128hz_err.txt          # ✅ Error file
+#SBATCH --output=memd_top20Channels_out.txt         # ✅ Output file
+#SBATCH --error=memd_top20Channels_err.txt          # ✅ Error file
 
 #SBATCH --mail-user=gustal@stud.ntnu.no
 #SBATCH --mail-type=ALL
@@ -17,7 +17,7 @@ WORKDIR=${SLURM_SUBMIT_DIR}
 cd ${WORKDIR}
 echo "Running from this directory: $SLURM_SUBMIT_DIR"
 echo "Name of job: $SLURM_JOB_NAME"
-echo "ID of job: $SLURM_JOB_ID"
+echo "ID of job: $SLURM_JOB_ID" 
 echo "The job was run on these nodes: $SLURM_JOB_NODELIST"
 
 module purge
@@ -27,4 +27,4 @@ module load Anaconda3/2023.09-0
 source ~/.bashrc
 conda activate dream_env
 
-python src/main.py --dev
+python src/main.py --memd

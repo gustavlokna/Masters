@@ -598,7 +598,7 @@ def memd(*args):
         # spurious extrema to appear
         if np.max(np.abs(m)) < (1e-10)*(np.max(np.abs(x))):
             if stop_sift == False:
-                warnings.warn('emd:warning','forced stop of EMD : too small amplitude')
+                warnings.warn('forced stop of EMD: too small amplitude', UserWarning)
             else:
                 print('forced stop of EMD : too small amplitude')
             break
@@ -617,7 +617,8 @@ def memd(*args):
             nbit=nbit+1
             
             if nbit == (MAXITERATIONS-1) and  nbit > 100:
-                warnings.warn('emd:warning','forced stop of sifting : too many erations')
+                warnings.warn('forced stop of sifting: too many iterations', UserWarning)
+
             
         q.append(m.transpose())
         

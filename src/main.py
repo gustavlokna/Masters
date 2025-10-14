@@ -7,6 +7,7 @@ from datapreprocessing.psd_filtering import apply_psd_pipeline
 from datapreprocessing.syntetic_imf import imf_mixing_pipeline
 from train.subject_importance import leave_one_subject_out_pipeline
 from train.loso_eeg import eeg_loso
+from train.model_eval import models_eval
 def main(args: argparse.Namespace) -> None:
     """
     Main function for the ML Piple
@@ -59,7 +60,7 @@ def main(args: argparse.Namespace) -> None:
         
     elif args.dev: 
         print("development mode")
-        eeg_loso(config)
+        models_eval(config)
     else:
         print("No valid arguments provided. Use --help for usage information.")
 
