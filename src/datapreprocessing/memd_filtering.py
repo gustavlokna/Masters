@@ -9,9 +9,8 @@ def load_data(npz_path):
     data = np.load(npz_path); 
     return data["X"], data["y"], data["subject"], data["sex"], data["age"]
 
-def save_filtered_data(output_path, X_filtered, y, subject, sex):
-    np.savez(output_path, X=X_filtered, y=y, subject=subject, sex=sex)
-    print(f"Saved filtered data to {output_path} with shape {X_filtered.shape}")
+def save_filtered_data(output_path, X_filtered, y, subject, sex, age):
+    np.savez(output_path, X=X_filtered, y=y, subject=subject, sex=sex, age = age)
 
 def memd_filter_segment_args(args):
     segment, memd_params = args

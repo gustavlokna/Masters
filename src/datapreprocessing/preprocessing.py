@@ -55,11 +55,8 @@ def preprocessing(config: dict) -> None:
             data = raw.get_data().T  # (samples, channels)
             labels = raw.ch_names
 
-            # Keeping only Channels that Adins Greedy search algorthim idetified as most usefull
-            # TODO are these still the best channels when splitting into man and woman files? 
+
             df = pd.DataFrame(data, columns=labels)
-
-
             # keep only Chan 1–256 (or 1–256 if no 'Chan ' prefix)
             keep_cols = [f"Chan {i}" for i in range(1, 257)]
             if set(keep_cols).issubset(df.columns):
@@ -68,11 +65,9 @@ def preprocessing(config: dict) -> None:
                 alt_cols = [str(i) for i in range(1, 257)]
                 df = df[alt_cols]
 
-
-            # Segment continuous EEG data into non-overlapping 2-second windows
-            # Each segment contains 640 samples (2.5s × 256Hz), across 20 selected channels
-            # Final shape: (num_segments, 640, 20) suitable for 3D ML input (e.g., CNN/RNN)
-            # Segment into 2.5s (640 samples)
+            # Segment continuous EEG data into non-overlapping epoch_length-second windows
+            # Each segment contains segment_len samples (epoch_length × fs)
+            # Final shape: (num_segments, segment_len, n_channels) suitable for 3D ML input (e.g., CNN/RNN)
             num_segments = df.shape[0] // segment_len
             print(f"number of segments {num_segments}")
 
@@ -101,7 +96,7 @@ def preprocessing(config: dict) -> None:
             all_ages.append(age_array)
 
     # Concatenate all subjects
-    X_all = np.concatenate(all_X, axis=0)
+    X_all = np.concatenate(all_X, axis=0) #shape of (n_segments, segment_len, n_channels)
     y_all = np.concatenate(all_y, axis=0)
     subject_all = np.concatenate(all_subjects, axis=0)
     sex_all = np.concatenate(all_sexes, axis=0)
