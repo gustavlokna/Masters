@@ -2,22 +2,13 @@ data:
   raw: Data/raw/  
   processed: Data/processed
   preprocessed: "Data/processed/segmented_2.5s_epoch_256hz.npz" # Combined preprocessed data from all subjects
-  memd: "Data/processed/memd_segmented_2.5s_epoch_256hz_top64_channels.npz" # Combined MEMD filtered data from all subjects
+  memd: "Data/processed/memd_segmented_2.5s_epoch_256hz_ALLCHANNELS_64_dir.npz" # Combined MEMD filtered data from all subjects
   psd: Data/processed/PSD_segmented_2.5s_epoch_256hz.npz # Combined PSD features from all subjects
-  csp: Data/processed/CSP_hz_125_epoch_10s_singleband.npz # Combined CSP features from all subjects
-  csp_fbcsp: Data/processed/CSP_hz_125_epoch_10s_fbcsp.npz # Combined FBCSP features from all subjects
   fs: 256  # Target sampling frequency after downsampling
   epoch_length: 2.5 # Length of each epoch in seconds
 
 
-output:
-  imf_metadata_csv: Data/exploration/imf_metadata.csv # Detailed IMF metadata for all channels
-  imf_metadata_excel: Data/exploration/imf_metadata.xlsx # Detailed IMF metadata for all channels in Excel format
-  imf_plot_root: Data/exploration/imf_plots
-  imf_plot_segments: [867, 884]   # example interesting segments
-  importance_root: "Data/exploration/results/feature_importances" # Root folder for feature importance plots
-
-#Extracted from file DreamCatcher/DEV/Greedy_algorithm/top2.ipynb from Adin Belsics masters
+#Extracted from file DreamCatcher/DEV/Greedy_algorithm/top2.ipynb from Adin Belsics masters (NOT ZERO INDEXED, if you want to use in python subtract 1)
 channels:
   top_64: [1, 6, 8, 9, 43, 44, 61, 65, 66, 67, 79, 82, 91, 92, 93, 94, 101, 102, 103, 110, 111, 119, 121, 125, 135, 144, 145, 146, 155, 156, 165, 175, 185, 187, 189, 194, 199, 203, 207, 208, 209, 210, 216, 218, 219, 221, 228, 229, 231, 232, 233, 234, 235, 236, 237, 240, 244, 246, 248, 249, 250, 251, 255, 256]
 
@@ -28,22 +19,11 @@ channels:
   top_20: [6, 8, 44, 66, 79, 102, 103, 111, 144, 155, 199, 208, 219, 229, 232, 233, 237, 248, 251, 256]
 
 memd_params:
-  num_directions: 512 # can try 64 or 512 as found in file job2_5 file from Adian Belsics masters
+  num_directions: 64 # can try 64 or 512 as found in file job2_5 file from Adian Belsics masters
   stop_criteria: "stop" 
   stop_args: [0.075, 0.75, 0.075]
   keep_imfs: 4   # new param
 
-
-# List of segments to exclude based on imf extraction. The segments under only gave a max of 4 imfs (3 + residue)
-exclude_segments: [
-  867, 882, 884, 905, 906, 925, 997, 1112, 1167, 1173, 1175, 1178,
-  1396, 1397, 1398, 1399, 1400, 2061, 2062, 2860, 3316, 3317, 3319, 3320,
-  3334, 3340, 3341, 3343, 3358, 3359, 6466, 6922, 6923, 6924, 6928, 6929,
-  6930, 6931, 6933, 6940, 6943, 6944, 7442, 7506, 7563, 7581, 7990, 8005,
-  8176, 8182, 8942, 9091, 9317, 9343, 9350, 9357, 12226, 12236, 12238, 12239,
-  12341, 12347, 12383, 12389, 12391, 12392, 12395, 12404, 12410, 12413, 12420,
-  12422, 12427, 12428
-]
 
 # Configs for imf mixing
 mixing: 
@@ -57,19 +37,6 @@ psd_bands:
   theta: [4, 8]
   alpha: [8, 12]
   beta: [13, 30]
-
-
-csp:
-  n_components: 6
-  reg: null
-  cov_est: concat
-  band: [8, 30]
-
-fbcsp:
-  bands:
-    - [4, 8]
-    - [8, 12]
-    - [12, 30]
 
 label_maps:
   #0_vs_2: {0: 0, 1: null, 2: 1}
