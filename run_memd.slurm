@@ -1,14 +1,14 @@
 #!/bin/bash
 #SBATCH --account=share-ie-idi
-#SBATCH --job-name=eeg_loso_all_gpu       # ✅ Job name  
+#SBATCH --job-name=eeg_3_labels       # ✅ Job name  
 #SBATCH --time=240:00:00
 
 #SBATCH --partition=GPUQ
 #SBATCH --gres=gpu:1
 #SBATCH --mem=600G
 #SBATCH --nodes=1
-#SBATCH --output=eeg_loso_all_gpu_out.txt         # ✅ Output file
-#SBATCH --error=eeg_loso_all_gpu_err.txt          # ✅ Error file
+#SBATCH --output=eeg_3_labels_out.txt         # ✅ Output file
+#SBATCH --error=eeg_3_labels_err.txt          # ✅ Error file
 
 #SBATCH --mail-user=gustal@stud.ntnu.no
 #SBATCH --mail-type=ALL
