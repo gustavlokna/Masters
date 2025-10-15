@@ -33,8 +33,8 @@ def load_raw_data(npz_path, config):
 
     print(f"Loaded RAW data: X={X.shape}, y={y.shape}")
 
-    selected = np.array(config["channels"]["top_64"]) - 1
-    X = X[:, :, selected]
+    #selected = np.array(config["channels"]["top_64"]) - 1
+    # = X[:, :, selected]
     X = np.transpose(X, (0, 2, 1))
     X = np.expand_dims(X, axis=-1)
 
@@ -64,12 +64,12 @@ def balance_classes(X, y):
     return np.vstack(X_balanced), np.vstack(y_balanced)
 
 
-def train_eegnet(X_train, y_train, nb_classes):
+def train_deep_eegnet(X_train, y_train, nb_classes):
     chans = X_train.shape[1]
     samples = X_train.shape[2]
-    model = DeepConvNet(nb_classes=nb_classes, Chans=chans, Samples=samples, dropoutRate=0.5)
+    model = DeepConvNet(nb_classes=nb_classes, Chans=chans, Samples=samples, dropoutRate=0.1)
     model.compile(loss='categorical_crossentropy', optimizer=Adam(learning_rate=1e-3), metrics=['accuracy'])
-    model.fit(X_train, y_train, epochs=300, batch_size=32, verbose=1)
+    model.fit(X_train, y_train, epochs=100, batch_size=64, verbose=1)
     return model
 
 
@@ -84,7 +84,7 @@ def evaluate_model(model, X_test, y_test):
     return acc, recall, kappa
 
 
-def test_deep_conv(config, output_excel="deep_conv_3_labels_raw_top64_results.xlsx"):
+def test_deep_conv(config, output_excel="deep_conv_3_labels_raw_results_all_subs.xlsx"):
     X, y, subject, sex, age = load_raw_data(config["data"]["preprocessed"], config)
     all_results = []
 
@@ -110,10 +110,9 @@ def test_deep_conv(config, output_excel="deep_conv_3_labels_raw_top64_results.xl
     X_test = X_test_scaled.reshape(X_test.shape[0], nch, ntime, 1)
 
     print("\n=== Baseline EEGNet (70/30 Split) ===")
-    model = train_eegnet(X_train, y_train, nb_classes)
+    model = train_deep_eegnet(X_train, y_train, nb_classes)
     base_acc, base_recall, base_kappa = evaluate_model(model, X_test, y_test)
     print(f"Baseline -> Acc: {base_acc:.4f}, Recall: {base_recall:.4f}, Kappa: {base_kappa:.4f}")
-    """
     subjects = np.unique(subject)
     
     for subj in subjects:
@@ -125,6 +124,7 @@ def test_deep_conv(config, output_excel="deep_conv_3_labels_raw_top64_results.xl
         X_val_subj = X[test_mask]
         y_val_subj = y_cat[test_mask]
 
+        # internal train/test for the current subject
         X_tr, X_te, y_tr, y_te = train_test_split(
             X_train_subj, y_train_subj, test_size=0.3,
             stratify=np.argmax(y_train_subj, axis=1), random_state=42
@@ -132,7 +132,26 @@ def test_deep_conv(config, output_excel="deep_conv_3_labels_raw_top64_results.xl
 
         X_tr, y_tr = balance_classes(X_tr, y_tr)
 
-        model = train_eegnet(X_tr, y_tr, nb_classes)
+        # ---- SUBJECT-WISE SCALING ----
+        nsamp_tr, nch, ntime, _ = X_tr.shape
+        nsamp_te = X_te.shape[0]
+        nsamp_val = X_val_subj.shape[0]
+
+        X_tr_flat = X_tr.reshape(nsamp_tr, nch * ntime)
+        X_te_flat = X_te.reshape(nsamp_te, nch * ntime)
+        X_val_flat = X_val_subj.reshape(nsamp_val, nch * ntime)
+
+        scaler = StandardScaler()
+        X_tr_scaled = scaler.fit_transform(X_tr_flat)
+        X_te_scaled = scaler.transform(X_te_flat)
+        X_val_scaled = scaler.transform(X_val_flat)
+
+        X_tr = X_tr_scaled.reshape(nsamp_tr, nch, ntime, 1)
+        X_te = X_te_scaled.reshape(nsamp_te, nch, ntime, 1)
+        X_val_subj = X_val_scaled.reshape(nsamp_val, nch, ntime, 1)
+        # ---- END SCALING ----
+
+        model = train_deep_eegnet(X_tr, y_tr, nb_classes)
         internal_acc, internal_recall, internal_kappa = evaluate_model(model, X_te, y_te)
         excl_acc, excl_recall, excl_kappa = evaluate_model(model, X_val_subj, y_val_subj)
 
@@ -150,12 +169,8 @@ def test_deep_conv(config, output_excel="deep_conv_3_labels_raw_top64_results.xl
         })
 
         print(f"Subject {subj}: internal_acc={internal_acc:.4f}, excluded_acc={excl_acc:.4f}")
-    """
-    all_results.append({
-        "baseline_acc": base_acc,
-        "baseline_recall": base_recall,
-        "baseline_kappa": base_kappa,
-    })
+
+
     df_results = pd.DataFrame(all_results)
     df_results.to_excel(output_excel, index=False)
     print(f"\nResults saved to {output_excel}")
