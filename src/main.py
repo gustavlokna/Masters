@@ -8,6 +8,7 @@ from datapreprocessing.syntetic_imf import imf_mixing_pipeline
 from train.subject_importance import leave_one_subject_out_pipeline
 from train.loso_eeg import eeg_loso, test_all_3_labels
 from train.model_eval import models_eval
+from train.deepConv import test_deep_conv
 def main(args: argparse.Namespace) -> None:
     """
     Main function for the ML Piple
@@ -60,7 +61,7 @@ def main(args: argparse.Namespace) -> None:
         
     elif args.dev: 
         print("development mode")
-        test_all_3_labels(config)
+        test_deep_conv(config)
     else:
         print("No valid arguments provided. Use --help for usage information.")
 
