@@ -2,23 +2,28 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, recall_score, cohen_kappa_score, classification_report
+from sklearn.utils import resample
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.optimizers import Adam
-from  utilities.EEGNet import EEGNet
-# Upsample minority class in training set
-from sklearn.utils import resample
+from utilities.EEGNet import EEGNet
 
 
 def load_raw_data(npz_path, config):
     data = np.load(npz_path, allow_pickle=True)
-    X, y, subject, sex = data["X"], data["y"], data["subject"], data["sex"]
+    X = data["X"]                     # shape: (epochs, samples, channels)
+    y = data["y"]
+    subject = data["subject"]
+    sex = data["sex"]
+    age = data["age"]
+
     print(f"Loaded RAW data: X={X.shape}, y={y.shape}")
 
     selected = np.array(config["channels"]["top_64"]) - 1
-    X = X[:, selected, :]  # shape: (epochs, channels, samples)
+    X = X[:, :, selected]            # -> shape: (epochs, samples, 64)
+    X = np.transpose(X, (0, 2, 1))   # -> shape: (epochs, 64, samples)
+    X = np.expand_dims(X, axis=-1)   # -> shape: (epochs, 64, samples, 1)
 
-    return X, y, subject, sex
-
+    return X, y, subject, sex, age
 
 
 def prepare_data(X, y, label_map):
@@ -26,6 +31,7 @@ def prepare_data(X, y, label_map):
     X_filtered = X[mask]
     y_filtered = np.array([label_map[lbl] for lbl in y[mask]], dtype=int)
     return X_filtered, y_filtered
+
 
 def balance_classes(X, y):
     y_labels = np.argmax(y, axis=1)
@@ -43,12 +49,12 @@ def balance_classes(X, y):
     return np.vstack(X_balanced), np.vstack(y_balanced)
 
 
-
 def train_eegnet(X_train, y_train, nb_classes):
-    chans, samples = X_train.shape[1], X_train.shape[2]
+    chans = X_train.shape[1]
+    samples = X_train.shape[2]
     model = EEGNet(nb_classes=nb_classes, Chans=chans, Samples=samples, dropoutRate=0.5)
     model.compile(loss='categorical_crossentropy', optimizer=Adam(learning_rate=1e-3), metrics=['accuracy'])
-    model.fit(X_train, y_train, epochs=500, batch_size=32, verbose=0)
+    model.fit(X_train, y_train, epochs=500, batch_size=32, verbose=1)
     return model
 
 
@@ -63,8 +69,8 @@ def evaluate_model(model, X_test, y_test):
     return acc, recall, kappa
 
 
-def eeg_loso(config, output_excel="EEGNet_loso_raw_channel_reduction_results.xlsx"):
-    X, y, subject, sex = load_raw_data(config["data"]["preprocessed"], config)
+def eeg_loso(config, output_excel="EEGNet_loso_raw_channel_reduction_top64_results.xlsx"):
+    X, y, subject, sex, age = load_raw_data(config["data"]["preprocessed"], config)
     all_results = []
 
     for map_name, label_map in config["label_maps"].items():
@@ -76,14 +82,9 @@ def eeg_loso(config, output_excel="EEGNet_loso_raw_channel_reduction_results.xls
             print(f"Skipping {map_name} (not enough classes).")
             continue
 
-        # transpose to (epochs, chans, samples)
-        X_filtered = np.transpose(X_filtered, (0, 2, 1))
-        X_filtered = np.expand_dims(X_filtered, axis=-1)
-
         nb_classes = len(np.unique(y_filtered))
         y_cat = to_categorical(y_filtered, nb_classes)
 
-        # Baseline EEGNet 70/30
         X_train, X_test, y_train, y_test = train_test_split(
             X_filtered, y_cat, test_size=0.3, stratify=y_filtered, random_state=42
         )
@@ -93,7 +94,15 @@ def eeg_loso(config, output_excel="EEGNet_loso_raw_channel_reduction_results.xls
         base_acc, base_recall, base_kappa = evaluate_model(model, X_test, y_test)
         print(f"Baseline -> Acc: {base_acc:.4f}, Recall: {base_recall:.4f}, Kappa: {base_kappa:.4f}")
 
+        all_results.append({
+            "label_map": map_name,
+            "baseline_acc": base_acc,
+            "baseline_recall": base_recall,
+            "baseline_kappa": base_kappa,
+        })
+        """
         subjects = np.unique(subj_filtered)
+        
         for subj in subjects:
             train_mask = subj_filtered != subj
             test_mask = subj_filtered == subj
@@ -107,6 +116,7 @@ def eeg_loso(config, output_excel="EEGNet_loso_raw_channel_reduction_results.xls
                 X_train_subj, y_train_subj, test_size=0.3,
                 stratify=np.argmax(y_train_subj, axis=1), random_state=42
             )
+
             X_tr, y_tr = balance_classes(X_tr, y_tr)
 
             model = train_eegnet(X_tr, y_tr, nb_classes)
@@ -126,10 +136,10 @@ def eeg_loso(config, output_excel="EEGNet_loso_raw_channel_reduction_results.xls
                 "excluded_recall": excl_recall,
                 "excluded_kappa": excl_kappa
             })
+            
 
             print(f"Subject {subj}: internal_acc={internal_acc:.4f}, excluded_acc={excl_acc:.4f}")
-
+            """
     df_results = pd.DataFrame(all_results)
     df_results.to_excel(output_excel, index=False)
     print(f"\nResults saved to {output_excel}")
-

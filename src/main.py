@@ -60,7 +60,7 @@ def main(args: argparse.Namespace) -> None:
         
     elif args.dev: 
         print("development mode")
-        models_eval(config)
+        eeg_loso(config)
     else:
         print("No valid arguments provided. Use --help for usage information.")
 
