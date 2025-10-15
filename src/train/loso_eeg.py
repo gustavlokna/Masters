@@ -5,12 +5,26 @@ from sklearn.metrics import accuracy_score, recall_score, cohen_kappa_score, cla
 from sklearn.utils import resample
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.optimizers import Adam
+import tensorflow as tf
 from utilities.EEGNet import EEGNet
+
+# Enable GPU usage
+gpus = tf.config.list_physical_devices('GPU')
+if gpus:
+    try:
+        for gpu in gpus:
+            tf.config.experimental.set_memory_growth(gpu, True)
+        tf.config.set_visible_devices(gpus[0], 'GPU')
+        print(f"Using GPU: {tf.config.get_visible_devices('GPU')[0].name}")
+    except RuntimeError as e:
+        print(e)
+else:
+    print("No GPU found. Running on CPU.")
 
 
 def load_raw_data(npz_path, config):
     data = np.load(npz_path, allow_pickle=True)
-    X = data["X"]                     # shape: (epochs, samples, channels)
+    X = data["X"]
     y = data["y"]
     subject = data["subject"]
     sex = data["sex"]
@@ -19,9 +33,9 @@ def load_raw_data(npz_path, config):
     print(f"Loaded RAW data: X={X.shape}, y={y.shape}")
 
     selected = np.array(config["channels"]["top_64"]) - 1
-    X = X[:, :, selected]            # -> shape: (epochs, samples, 64)
-    X = np.transpose(X, (0, 2, 1))   # -> shape: (epochs, 64, samples)
-    X = np.expand_dims(X, axis=-1)   # -> shape: (epochs, 64, samples, 1)
+    X = X[:, :, selected]
+    X = np.transpose(X, (0, 2, 1))
+    X = np.expand_dims(X, axis=-1)
 
     return X, y, subject, sex, age
 
@@ -68,32 +82,8 @@ def evaluate_model(model, X_test, y_test):
     print(classification_report(y_true, y_pred, zero_division=0))
     return acc, recall, kappa
 
+
 def balance_train_classes(X_train, y_train):
-    """
-    Balance class distribution in the training set by upsampling the minority class.
-
-    Parameters
-    ----------
-    X_train : array-like, shape (n_samples, n_features)
-        Feature matrix for the training data.
-    y_train : array-like, shape (n_samples,)
-        Labels corresponding to X_train.
-
-    Returns
-    -------
-    X_balanced : ndarray, shape (n_samples_balanced, n_features)
-        Training feature matrix with balanced class representation.
-    y_balanced : ndarray, shape (n_samples_balanced,)
-        Labels corresponding to X_balanced with equal class counts.
-
-    Notes
-    -----
-    - The function identifies the minority and majority classes in `y_train`.
-    - The minority class is upsampled with replacement until it matches
-      the number of samples in the majority class.
-    - The resulting dataset preserves all majority samples and duplicates
-      minority samples as needed.
-    """
     X_df = pd.DataFrame(X_train)
     y_df = pd.Series(y_train, name="label")
     df = pd.concat([X_df, y_df], axis=1)
@@ -116,6 +106,7 @@ def balance_train_classes(X_train, y_train):
     y_balanced = df_balanced["label"].values
 
     return X_balanced, y_balanced
+
 
 def eeg_loso(config, output_excel="EEGNet_loso_raw_channel_reduction_top64_results.xlsx"):
     X, y, subject, sex, age = load_raw_data(config["data"]["preprocessed"], config)
@@ -143,15 +134,8 @@ def eeg_loso(config, output_excel="EEGNet_loso_raw_channel_reduction_top64_resul
         base_acc, base_recall, base_kappa = evaluate_model(model, X_test, y_test)
         print(f"Baseline -> Acc: {base_acc:.4f}, Recall: {base_recall:.4f}, Kappa: {base_kappa:.4f}")
 
-        all_results.append({
-            "label_map": map_name,
-            "baseline_acc": base_acc,
-            "baseline_recall": base_recall,
-            "baseline_kappa": base_kappa,
-        })
-        
         subjects = np.unique(subj_filtered)
-        
+
         for subj in subjects:
             train_mask = subj_filtered != subj
             test_mask = subj_filtered == subj
@@ -185,10 +169,9 @@ def eeg_loso(config, output_excel="EEGNet_loso_raw_channel_reduction_top64_resul
                 "excluded_recall": excl_recall,
                 "excluded_kappa": excl_kappa
             })
-            
 
             print(f"Subject {subj}: internal_acc={internal_acc:.4f}, excluded_acc={excl_acc:.4f}")
-            
+
     df_results = pd.DataFrame(all_results)
     df_results.to_excel(output_excel, index=False)
     print(f"\nResults saved to {output_excel}")
