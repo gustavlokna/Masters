@@ -83,6 +83,65 @@ def evaluate_model(model, X_test, y_test):
     return acc, recall, kappa
 
 
+def test_all_3_labels(config, output_excel="EEGNET_3_labels_raw_top64_results.xlsx"):
+    X, y, subject, sex, age = load_raw_data(config["data"]["preprocessed"], config)
+    all_results = []
+
+    nb_classes = len(np.unique(y))
+    y_cat = to_categorical(y, nb_classes)
+
+    # 70/30 split baseline
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y_cat, test_size=0.3, stratify=y, random_state=42
+    )
+    X_train, y_train = balance_classes(X_train, y_train)
+
+    print("\n=== Baseline EEGNet (70/30 Split) ===")
+    model = train_eegnet(X_train, y_train, nb_classes)
+    base_acc, base_recall, base_kappa = evaluate_model(model, X_test, y_test)
+    print(f"Baseline -> Acc: {base_acc:.4f}, Recall: {base_recall:.4f}, Kappa: {base_kappa:.4f}")
+
+    subjects = np.unique(subject)
+
+    for subj in subjects:
+        train_mask = subject != subj
+        test_mask = subject == subj
+
+        X_train_subj = X[train_mask]
+        y_train_subj = y_cat[train_mask]
+        X_val_subj = X[test_mask]
+        y_val_subj = y_cat[test_mask]
+
+        X_tr, X_te, y_tr, y_te = train_test_split(
+            X_train_subj, y_train_subj, test_size=0.3,
+            stratify=np.argmax(y_train_subj, axis=1), random_state=42
+        )
+
+        X_tr, y_tr = balance_classes(X_tr, y_tr)
+
+        model = train_eegnet(X_tr, y_tr, nb_classes)
+        internal_acc, internal_recall, internal_kappa = evaluate_model(model, X_te, y_te)
+        excl_acc, excl_recall, excl_kappa = evaluate_model(model, X_val_subj, y_val_subj)
+
+        all_results.append({
+            "subject": subj,
+            "baseline_acc": base_acc,
+            "baseline_recall": base_recall,
+            "baseline_kappa": base_kappa,
+            "internal_acc": internal_acc,
+            "internal_recall": internal_recall,
+            "internal_kappa": internal_kappa,
+            "excluded_acc": excl_acc,
+            "excluded_recall": excl_recall,
+            "excluded_kappa": excl_kappa
+        })
+
+        print(f"Subject {subj}: internal_acc={internal_acc:.4f}, excluded_acc={excl_acc:.4f}")
+
+    df_results = pd.DataFrame(all_results)
+    df_results.to_excel(output_excel, index=False)
+    print(f"\nResults saved to {output_excel}")
+
 
 
 
