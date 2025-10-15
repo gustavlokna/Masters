@@ -83,29 +83,7 @@ def evaluate_model(model, X_test, y_test):
     return acc, recall, kappa
 
 
-def balance_train_classes(X_train, y_train):
-    X_df = pd.DataFrame(X_train)
-    y_df = pd.Series(y_train, name="label")
-    df = pd.concat([X_df, y_df], axis=1)
 
-    majority_class = df["label"].value_counts().idxmax()
-    minority_class = df["label"].value_counts().idxmin()
-
-    df_majority = df[df["label"] == majority_class]
-    df_minority = df[df["label"] == minority_class]
-
-    df_minority_upsampled = resample(
-        df_minority,
-        replace=True,
-        n_samples=len(df_majority),
-        random_state=42
-    )
-
-    df_balanced = pd.concat([df_majority, df_minority_upsampled])
-    X_balanced = df_balanced.drop(columns=["label"]).values
-    y_balanced = df_balanced["label"].values
-
-    return X_balanced, y_balanced
 
 
 def eeg_loso(config, output_excel="EEGNet_loso_raw_channel_reduction_top64_results.xlsx"):
@@ -127,7 +105,7 @@ def eeg_loso(config, output_excel="EEGNet_loso_raw_channel_reduction_top64_resul
         X_train, X_test, y_train, y_test = train_test_split(
             X_filtered, y_cat, test_size=0.3, stratify=y_filtered, random_state=42
         )
-        X_train, y_train = balance_train_classes(X_train, y_train)
+        X_train, y_train = balance_classes(X_train, y_train)
 
         print("\n=== Baseline EEGNet (70/30 Split) ===")
         model = train_eegnet(X_train, y_train, nb_classes)
@@ -150,7 +128,7 @@ def eeg_loso(config, output_excel="EEGNet_loso_raw_channel_reduction_top64_resul
                 stratify=np.argmax(y_train_subj, axis=1), random_state=42
             )
 
-            X_tr, y_tr = balance_train_classes(X_tr, y_tr)
+            X_tr, y_tr = balance_classes(X_tr, y_tr)
 
             model = train_eegnet(X_tr, y_tr, nb_classes)
             internal_acc, internal_recall, internal_kappa = evaluate_model(model, X_te, y_te)
