@@ -84,7 +84,7 @@ def evaluate_model(model, X_test, y_test):
     return acc, recall, kappa
 
 
-def test_deep_conv(config, output_excel="deep_conv_3_labels_raw_results_all_subs.xlsx"):
+def test_deep_conv(config, output_excel="testing_deep_con_3_labels.xlsx"):
     X, y, subject, sex, age = load_raw_data(config["data"]["preprocessed"], config)
     all_results = []
 
@@ -114,7 +114,7 @@ def test_deep_conv(config, output_excel="deep_conv_3_labels_raw_results_all_subs
     base_acc, base_recall, base_kappa = evaluate_model(model, X_test, y_test)
     print(f"Baseline -> Acc: {base_acc:.4f}, Recall: {base_recall:.4f}, Kappa: {base_kappa:.4f}")
     subjects = np.unique(subject)
-    
+    """
     for subj in subjects:
         train_mask = subject != subj
         test_mask = subject == subj
@@ -170,7 +170,12 @@ def test_deep_conv(config, output_excel="deep_conv_3_labels_raw_results_all_subs
 
         print(f"Subject {subj}: internal_acc={internal_acc:.4f}, excluded_acc={excl_acc:.4f}")
 
-
+    """
+    all_results.append({
+    "baseline_acc": base_acc,
+    "baseline_recall": base_recall,
+    "baseline_kappa": base_kappa,
+    })
     df_results = pd.DataFrame(all_results)
     df_results.to_excel(output_excel, index=False)
     print(f"\nResults saved to {output_excel}")
