@@ -84,7 +84,7 @@ def evaluate_model(model, X_test, y_test):
     return acc, recall, kappa
 
 
-def test_deep_conv(config, output_excel="testing_deep_con_3_labels.xlsx"):
+def test_deep_conv(config, output_excel="Only_one_testing_deep_conv_3_labels.xlsx"):
     X, y, subject, sex, age = load_raw_data(config["data"]["preprocessed"], config)
     all_results = []
 
