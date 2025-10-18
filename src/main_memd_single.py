@@ -1,7 +1,7 @@
 import argparse
 from typing import Any
 from utilities.config import read_config
-from datapreprocessing.memd_filtering import apply_memd_single_band_pipeline
+from datapreprocessing.single_subject_memd_filtering import apply_memd_single_band_pipeline
 
 def main(args: argparse.Namespace) -> None:
     """
