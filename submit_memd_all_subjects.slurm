@@ -37,7 +37,7 @@ for subj in "${subjects[@]}"; do
 #SBATCH --job-name=memd_subj_${subj}
 #SBATCH --time=240:00:00
 #SBATCH --partition=GPUQ
-#SBATCH --mem= 240G
+#SBATCH --mem=240G
 
 #SBATCH --nodes=1
 #SBATCH --output=logs/memd_subj_${subj}_out.txt
