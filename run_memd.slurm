@@ -1,14 +1,14 @@
 #!/bin/bash
 #SBATCH --account=share-ie-idi
-#SBATCH --job-name=test_deep_conv_small       # ✅ Job name  
+#SBATCH --job-name=data_proess       # ✅ Job name  
 #SBATCH --time=240:00:00
 
 #SBATCH --partition=GPUQ
 #SBATCH --gres=gpu:1
 #SBATCH --mem=600G
 #SBATCH --nodes=1
-#SBATCH --output=test_deep_conv_small_out.txt         # ✅ Output file
-#SBATCH --error=test_deep_conv_small_err.txt          # ✅ Error file
+#SBATCH --output=logs/data_proess_out.txt         # ✅ Output file
+#SBATCH --error=logs/data_proess_err.txt          # ✅ Error file
 
 #SBATCH --mail-user=gustal@stud.ntnu.no
 #SBATCH --mail-type=ALL
