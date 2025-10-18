@@ -56,7 +56,7 @@ def apply_memd_filter(X, memd_params):
 
 
 def apply_memd_single_band_pipeline(config: dict, subject_id: str) -> None:
-    input_path = config["data"]["preprocessed"]
+    input_path = config["data"]["preprocessed_no_bp"]
     base_output_dir = config["data"]["memd_single_band"]
     memd_params = config["memd_params"]
 

@@ -2,6 +2,7 @@ data:
   raw: Data/raw/  
   processed: Data/processed
   preprocessed: "Data/processed/segmented_2.5s_epoch_256hz.npz" # Combined preprocessed data from all subjects
+  preprocessed_no_bp: "Data/processed/segmented_2.5s_epoch_256hz_no_bp_filter.npz" # Combined preprocessed data without bandpass filtering from all subjects
   memd_single_band: Data/memd
   memd: "Data/processed/memd_segmented_2.5s_epoch_256hz_ALLCHANNELS_512_dir.npz" # Combined MEMD filtered data from all subjects
   psd: Data/processed/PSD_segmented_2.5s_epoch_256hz.npz # Combined PSD features from all subjects
