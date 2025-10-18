@@ -47,7 +47,8 @@ def preprocessing(config: dict) -> None:
             # Re-sizeing
             raw.crop(tmin=0, tmax=crop_tmax)
             # Bandpass filtering
-            raw.filter(0.5, 35)
+            # Commented out to remove for memd filtering 
+            # raw.filter(0.5, 35)
             # Downsampeling
             raw.resample(fs_target)
 
@@ -104,7 +105,7 @@ def preprocessing(config: dict) -> None:
     # Save data
     outpath = os.path.join(
         config["data"]["processed"],
-        f"segmented_{epoch_length}s_epoch_{fs_target}hz.npz"
+        f"segmented_{epoch_length}s_epoch_{fs_target}hz_no_bp_filter.npz"
     )
 
     np.savez(
