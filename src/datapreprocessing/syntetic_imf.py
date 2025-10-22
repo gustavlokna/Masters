@@ -14,29 +14,39 @@ def load_memd_data(npz_path):
     return data["X"], data["y"], data["subject"], data["sex"]
 
 def load_all_memd_data(folder_path):
-    """
-    load all .npz files in a folder and concatenate them
-    Assumes each .npz file has arrays:
-    - X: (n_segments, n_imfs, samples, channels)        
-    - y: (n_segments,)
-    - subject: (n_segments,)'
-    - sex   : (n_segments,)
-    """
     X_list, y_list, subject_list, sex_list = [], [], [], []
     files = [f for f in os.listdir(folder_path) if f.endswith(".npz")]
+    max_imfs = 0
+
+    # first pass to find max number of IMFs
     for file in files:
         data = np.load(os.path.join(folder_path, file))
-        X_list.append(data["X"])
-        y_list.append(data["y"])
-        subject_list.append(data["subject"])
-        sex_list.append(data["sex"])
-        print(f"Loaded {file} with shape {data['X'].shape}")
+        X = data["X"]
+        max_imfs = max(max_imfs, X.shape[1])
+
+    # second pass: pad and collect
+    for file in files:
+        data = np.load(os.path.join(folder_path, file))
+        X = data["X"]
+        y, subject, sex = data["y"], data["subject"], data["sex"]
+        n_imfs, samples, channels = X.shape[1:]
+        if n_imfs < max_imfs:
+            pad_shape = (X.shape[0], max_imfs - n_imfs, samples, channels)
+            X = np.concatenate([X, np.zeros(pad_shape, dtype=X.dtype)], axis=1)
+            print(f"Padded {file} from {n_imfs}→{max_imfs} IMFs")
+        X_list.append(X)
+        y_list.append(y)
+        subject_list.append(subject)
+        sex_list.append(sex)
+        print(f"Loaded {file} with shape {X.shape}")
+
     X = np.concatenate(X_list, axis=0)
     y = np.concatenate(y_list, axis=0)
     subject = np.concatenate(subject_list, axis=0)
     sex = np.concatenate(sex_list, axis=0)
     print(f"Total combined shape: {X.shape}")
     return X, y, subject, sex
+
 
 def save_mixed_data(output_path, X, y, subject, sex, synthetic_flag):
     np.savez(
