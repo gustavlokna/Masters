@@ -65,6 +65,8 @@ def main(args: argparse.Namespace) -> None:
     else:
         print("No valid arguments provided. Use --help for usage information.")
 
+        
+
 def parse_arguments() -> argparse.Namespace:
     """
     Parse command line arguments.

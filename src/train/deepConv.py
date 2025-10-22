@@ -7,6 +7,7 @@ from sklearn.preprocessing import StandardScaler
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.optimizers import Adam
 import tensorflow as tf
+import os
 from utilities.EEGNet import DeepConvNet
 
 # Enable GPU usage
@@ -84,8 +85,9 @@ def evaluate_model(model, X_test, y_test):
     return acc, recall, kappa
 
 
-def test_deep_conv(config, output_excel="Only_one_testing_deep_conv_3_labels.xlsx"):
-    X, y, subject, sex, age = load_raw_data(config["data"]["preprocessed"], config)
+def test_deep_conv(config, file_path):
+    X, y, subject, sex, age = load_raw_data(file_path, config)
+
     all_results = []
 
     nb_classes = len(np.unique(y))
@@ -189,6 +191,10 @@ def test_deep_conv(config, output_excel="Only_one_testing_deep_conv_3_labels.xls
     all_results.extend(subj_results)
     all_results.append(avg_row)
 
+    # name output file after input npz
+    input_name = os.path.splitext(os.path.basename(config["data"]["preprocessed"]))[0]
+    output_path = f"model_eval/loso_eval_{input_name}_loaded.xlsx"
+
     df_results = pd.DataFrame(all_results)
-    df_results.to_excel(output_excel, index=False)
-    print(f"\nResults saved to {output_excel}")
+    df_results.to_excel(output_path, index=False)
+    print(f"\nResults saved to {output_path}")
