@@ -9,6 +9,7 @@ data:
   psd: Data/processed/PSD_segmented_2.5s_epoch_256hz.npz # Combined PSD features from all subjects
   fs: 256  # Target sampling frequency after downsampling
   epoch_length: 2.5 # Length of each epoch in seconds
+  epoch_lengths: [1,2,3,5,10,15,20,25,30] # List of epoch lengths to preprocess
 
 
 #Extracted from file DreamCatcher/DEV/Greedy_algorithm/top2.ipynb from Adin Belsics masters (NOT ZERO INDEXED, if you want to use in python subtract 1)
