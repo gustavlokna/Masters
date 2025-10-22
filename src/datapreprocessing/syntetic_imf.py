@@ -109,8 +109,8 @@ def imf_mixing_pipeline(config: dict):
     n_new = config["mixing"]["n_new"]
     filter_on_sex = config["mixing"]["filter_on_sex"]
 
-    fs = config["Data"]["fs"]
-    epoch_length = config["Data"]["epoch_length"]
+    fs = config["data"]["fs"]
+    epoch_length = config["data"]["epoch_length"]
 
     X, y, subject, sex = load_all_memd_data(folder_path)
     X_new, y_new, subject_new, sex_new, synthetic_flag = mix_imfs_channel_consistent(
