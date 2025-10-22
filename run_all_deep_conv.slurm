@@ -59,6 +59,6 @@ module load Anaconda3/2023.09-0
 source ~/.bashrc
 conda activate dream_env
 
-python main_deep_conv.py --file ${f}
+python src/main_deep_conv.py --file ${f}
 EOF
 done
