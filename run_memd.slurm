@@ -1,14 +1,14 @@
 #!/bin/bash
 #SBATCH --account=share-ie-idi
-#SBATCH --job-name=data_proess       # ✅ Job name  
+#SBATCH --job-name=imf_mixing       # ✅ Job name  
 #SBATCH --time=240:00:00
 
 #SBATCH --partition=GPUQ
 #SBATCH --gres=gpu:1
 #SBATCH --mem=600G
 #SBATCH --nodes=1
-#SBATCH --output=logs/data_proess_out.txt         # ✅ Output file
-#SBATCH --error=logs/data_proess_err.txt          # ✅ Error file
+#SBATCH --output=logs/imf_mixing_out.txt         # ✅ Output file
+#SBATCH --error=logs/imf_mixing_err.txt          # ✅ Error file
 
 #SBATCH --mail-user=gustal@stud.ntnu.no
 #SBATCH --mail-type=ALL
@@ -27,4 +27,4 @@ module load Anaconda3/2023.09-0
 source ~/.bashrc
 conda activate dream_env
 
-python src/main.py --preprocess
+python src/main.py --imf_mixing

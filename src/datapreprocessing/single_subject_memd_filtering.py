@@ -71,6 +71,6 @@ def apply_memd_single_band_pipeline(config: dict, subject_id: str) -> None:
     X_filtered = apply_memd_filter(X_subj, memd_params)
 
     # Save file as memd_filtered_SUBJECT_ID.npz
-    output_file = os.path.join(base_output_dir, f"memd_filtered_{subject_id}.npz")
+    output_file = os.path.join(base_output_dir, f"memd_filtered_{subject_id}_2.5_sepoch_256hz.npz")
     save_filtered_data(output_file, X_filtered, y_subj, subject_id, sex_subj, age_subj)
 

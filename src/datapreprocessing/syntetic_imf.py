@@ -1,11 +1,42 @@
 import numpy as np
 import random
+import os
 
 
 def load_memd_data(npz_path):
+    """
+    Use if the data is stored in .npz format with arrays:
+    - X: (n_segments, n_imfs, samples, channels)    
+    - y: (n_segments,)
+    - subject: (n_segments,)
+    """
     data = np.load(npz_path)
     return data["X"], data["y"], data["subject"], data["sex"]
 
+def load_all_memd_data(folder_path):
+    """
+    load all .npz files in a folder and concatenate them
+    Assumes each .npz file has arrays:
+    - X: (n_segments, n_imfs, samples, channels)        
+    - y: (n_segments,)
+    - subject: (n_segments,)'
+    - sex   : (n_segments,)
+    """
+    X_list, y_list, subject_list, sex_list = [], [], [], []
+    files = [f for f in os.listdir(folder_path) if f.endswith(".npz")]
+    for file in files:
+        data = np.load(os.path.join(folder_path, file))
+        X_list.append(data["X"])
+        y_list.append(data["y"])
+        subject_list.append(data["subject"])
+        sex_list.append(data["sex"])
+        print(f"Loaded {file} with shape {data['X'].shape}")
+    X = np.concatenate(X_list, axis=0)
+    y = np.concatenate(y_list, axis=0)
+    subject = np.concatenate(subject_list, axis=0)
+    sex = np.concatenate(sex_list, axis=0)
+    print(f"Total combined shape: {X.shape}")
+    return X, y, subject, sex
 
 def save_mixed_data(output_path, X, y, subject, sex, synthetic_flag):
     np.savez(
@@ -71,14 +102,14 @@ def mix_imfs_channel_consistent(X, y, subject, sex, n_imfs=5, n_new=10000, filte
 
 
 def imf_mixing_pipeline(config: dict):
-    input_path = config["data"]["memd"]
+    folder_path = config["data"]["memd_single_band"]
     output_path = config["data"]["mixed"]
-
     n_imfs = config["mixing"]["n_imfs"]
     n_new = config["mixing"]["n_new"]
     filter_on_sex = config["mixing"]["filter_on_sex"]
 
-    X, y, subject, sex = load_memd_data(input_path)
+    #X, y, subject, sex = load_memd_data(input_path)
+    X, y, subject, sex = load_all_memd_data(folder_path)
     X_new, y_new, subject_new, sex_new, synthetic_flag = mix_imfs_channel_consistent(
         X, y, subject, sex, n_imfs=n_imfs, n_new=n_new, filter_on_sex=filter_on_sex
     )
