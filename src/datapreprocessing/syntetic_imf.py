@@ -103,29 +103,31 @@ def mix_imfs_channel_consistent(X, y, subject, sex, n_imfs=5, n_new=10000, filte
 
 def imf_mixing_pipeline(config: dict):
     folder_path = config["data"]["memd_single_band"]
-    output_path = config["data"]["mixed"]
+    base_output_dir = config["data"]["mixed"]
+
     n_imfs = config["mixing"]["n_imfs"]
     n_new = config["mixing"]["n_new"]
     filter_on_sex = config["mixing"]["filter_on_sex"]
 
-    #X, y, subject, sex = load_memd_data(input_path)
+    fs = config["Data"]["fs"]
+    epoch_length = config["Data"]["epoch_length"]
+
     X, y, subject, sex = load_all_memd_data(folder_path)
     X_new, y_new, subject_new, sex_new, synthetic_flag = mix_imfs_channel_consistent(
         X, y, subject, sex, n_imfs=n_imfs, n_new=n_new, filter_on_sex=filter_on_sex
     )
 
-    # --- Final reduction step: sum over first n_imfs ---
-    X_orig_reduced = np.sum(X[:, :n_imfs, :, :], axis=1)  # (n_segments, samples, channels)
-    X_new_reduced = np.sum(X_new[:, :n_imfs, :, :], axis=1)  # (n_new, samples, channels)
+    X_orig_reduced = np.sum(X[:, :n_imfs, :, :], axis=1)
+    X_new_reduced = np.sum(X_new[:, :n_imfs, :, :], axis=1)
 
-    # combine originals + synthetic
     X_all = np.concatenate([X_orig_reduced, X_new_reduced], axis=0)
     y_all = np.concatenate([y, y_new], axis=0)
     subject_all = np.concatenate([subject, subject_new], axis=0)
     sex_all = np.concatenate([sex, sex_new], axis=0)
     synthetic_all = np.concatenate([np.zeros(len(y), dtype=int), synthetic_flag], axis=0)
 
+    filename = f"memd_imf_mixed_fs{fs}_epoch{epoch_length}_len_{n_imfs}imfs_{n_new}new.npz"
+    output_path = os.path.join(base_output_dir, filename)
+
     save_mixed_data(output_path, X_all, y_all, subject_all, sex_all, synthetic_all)
-    print(
-        f"Mixed data shape: {X_all.shape}, original samples: {len(y)}, synthetic samples: {len(y_new)}"
-    )
+    print(f"Mixed data shape: {X_all.shape}, original samples: {len(y)}, synthetic samples: {len(y_new)}")
