@@ -165,12 +165,15 @@ def balance_train_classes(X_train, y_train):
 
     return X_balanced, y_balanced
 
-def models_eval(config, output_excel="all_models_all_labels_with_sex_and_age.xlsx"):
+def models_eval(config):
+    npz_path = config["data"]["psd"]
+    output_excel = f"{npz_path.rsplit('/', 1)[-1].replace('.npz', '')}_results.xlsx"
+    
     X, y, subject, band_names, sex ,age= load_psd_data(config["data"]["psd"])
-    X = add_sex_age_features(X, sex, age) 
+    #X = add_sex_age_features(X, sex, age) 
     all_results = []
      #["MLP", "KNN", "SVC", "LogisticRegression", "RandomForest", "XGBoost"]
-    model_types = ["MLP", "KNN", "SVC", "LogisticRegression", "RandomForest", "XGBoost"]
+    model_types = ["KNN", "SVC", "LogisticRegression", "RandomForest", "XGBoost"]
 
     for map_name, label_map in config["label_maps"].items():
         print(f"\n=== Running label map: {map_name} ===")
@@ -198,7 +201,7 @@ def models_eval(config, output_excel="all_models_all_labels_with_sex_and_age.xls
                 base_acc, base_recall, base_kappa = evaluate_model(
                     model, scaler, X_test, y_test, model_type
                 )
-
+            subj_results = []
             subjects = np.unique(subj_filtered)
 
             for subj in subjects:
@@ -231,7 +234,7 @@ def models_eval(config, output_excel="all_models_all_labels_with_sex_and_age.xls
                         model, scaler, X_val_subj, y_val_subj, model_type
                     )
 
-                all_results.append({
+                subj_results.append({
                     "model_type": model_type,
                     "label_map": map_name,
                     "subject": subj,
@@ -245,8 +248,27 @@ def models_eval(config, output_excel="all_models_all_labels_with_sex_and_age.xls
                     "excluded_recall": excl_recall,
                     "excluded_kappa": excl_kappa
                 })
-
                 print(f"{model_type} -> Subject {subj}: internal_acc={internal_acc:.4f}, excluded_acc={excl_acc:.4f}")
+
+            # average across subjects
+            subj_df = pd.DataFrame(subj_results)
+            avg_row = {
+                "model_type": model_type,
+                "label_map": map_name,
+                "subject": "average",
+                "baseline_acc": subj_df["baseline_acc"].mean(),
+                "baseline_recall": subj_df["baseline_recall"].mean(),
+                "baseline_kappa": subj_df["baseline_kappa"].mean(),
+                "internal_acc": subj_df["internal_acc"].mean(),
+                "internal_recall": subj_df["internal_recall"].mean(),
+                "internal_kappa": subj_df["internal_kappa"].mean(),
+                "excluded_acc": subj_df["excluded_acc"].mean(),
+                "excluded_recall": subj_df["excluded_recall"].mean(),
+                "excluded_kappa": subj_df["excluded_kappa"].mean(),
+            }
+
+            all_results.extend(subj_results)
+            all_results.append(avg_row)
 
     df_results = pd.DataFrame(all_results)
     df_results.to_excel(output_excel, index=False)

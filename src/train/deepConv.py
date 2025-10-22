@@ -113,8 +113,9 @@ def test_deep_conv(config, output_excel="Only_one_testing_deep_conv_3_labels.xls
     model = train_deep_eegnet(X_train, y_train, nb_classes)
     base_acc, base_recall, base_kappa = evaluate_model(model, X_test, y_test)
     print(f"Baseline -> Acc: {base_acc:.4f}, Recall: {base_recall:.4f}, Kappa: {base_kappa:.4f}")
+
     subjects = np.unique(subject)
-    """
+    subj_results = []
     for subj in subjects:
         train_mask = subject != subj
         test_mask = subject == subj
@@ -155,7 +156,7 @@ def test_deep_conv(config, output_excel="Only_one_testing_deep_conv_3_labels.xls
         internal_acc, internal_recall, internal_kappa = evaluate_model(model, X_te, y_te)
         excl_acc, excl_recall, excl_kappa = evaluate_model(model, X_val_subj, y_val_subj)
 
-        all_results.append({
+        subj_results.append({
             "subject": subj,
             "baseline_acc": base_acc,
             "baseline_recall": base_recall,
@@ -170,82 +171,23 @@ def test_deep_conv(config, output_excel="Only_one_testing_deep_conv_3_labels.xls
 
         print(f"Subject {subj}: internal_acc={internal_acc:.4f}, excluded_acc={excl_acc:.4f}")
 
-    """
-    all_results.append({
-    "baseline_acc": base_acc,
-    "baseline_recall": base_recall,
-    "baseline_kappa": base_kappa,
-    })
-    df_results = pd.DataFrame(all_results)
-    df_results.to_excel(output_excel, index=False)
-    print(f"\nResults saved to {output_excel}")
+    # average across subjects
+    subj_df = pd.DataFrame(subj_results)
+    avg_row = {
+        "subject": "average",
+        "baseline_acc": subj_df["baseline_acc"].mean(),
+        "baseline_recall": subj_df["baseline_recall"].mean(),
+        "baseline_kappa": subj_df["baseline_kappa"].mean(),
+        "internal_acc": subj_df["internal_acc"].mean(),
+        "internal_recall": subj_df["internal_recall"].mean(),
+        "internal_kappa": subj_df["internal_kappa"].mean(),
+        "excluded_acc": subj_df["excluded_acc"].mean(),
+        "excluded_recall": subj_df["excluded_recall"].mean(),
+        "excluded_kappa": subj_df["excluded_kappa"].mean(),
+    }
 
-
-
-
-def eeg_loso(config, output_excel="EEGNet_loso_raw_channel_reduction_top64_results.xlsx"):
-    X, y, subject, sex, age = load_raw_data(config["data"]["preprocessed"], config)
-    all_results = []
-
-    for map_name, label_map in config["label_maps"].items():
-        print(f"\n=== Running label map: {map_name} ===")
-        X_filtered, y_filtered = prepare_data(X, y, label_map)
-        subj_filtered = np.array(subject)[[label_map.get(lbl, None) is not None for lbl in y]]
-
-        if len(np.unique(y_filtered)) < 2:
-            print(f"Skipping {map_name} (not enough classes).")
-            continue
-
-        nb_classes = len(np.unique(y_filtered))
-        y_cat = to_categorical(y_filtered, nb_classes)
-
-        X_train, X_test, y_train, y_test = train_test_split(
-            X_filtered, y_cat, test_size=0.3, stratify=y_filtered, random_state=42
-        )
-        X_train, y_train = balance_classes(X_train, y_train)
-
-        print("\n=== Baseline EEGNet (70/30 Split) ===")
-        model = train_eegnet(X_train, y_train, nb_classes)
-        base_acc, base_recall, base_kappa = evaluate_model(model, X_test, y_test)
-        print(f"Baseline -> Acc: {base_acc:.4f}, Recall: {base_recall:.4f}, Kappa: {base_kappa:.4f}")
-
-        subjects = np.unique(subj_filtered)
-
-        for subj in subjects:
-            train_mask = subj_filtered != subj
-            test_mask = subj_filtered == subj
-
-            X_train_subj = X_filtered[train_mask]
-            y_train_subj = y_cat[train_mask]
-            X_val_subj = X_filtered[test_mask]
-            y_val_subj = y_cat[test_mask]
-
-            X_tr, X_te, y_tr, y_te = train_test_split(
-                X_train_subj, y_train_subj, test_size=0.3,
-                stratify=np.argmax(y_train_subj, axis=1), random_state=42
-            )
-
-            X_tr, y_tr = balance_classes(X_tr, y_tr)
-
-            model = train_eegnet(X_tr, y_tr, nb_classes)
-            internal_acc, internal_recall, internal_kappa = evaluate_model(model, X_te, y_te)
-            excl_acc, excl_recall, excl_kappa = evaluate_model(model, X_val_subj, y_val_subj)
-
-            all_results.append({
-                "label_map": map_name,
-                "subject": subj,
-                "baseline_acc": base_acc,
-                "baseline_recall": base_recall,
-                "baseline_kappa": base_kappa,
-                "internal_acc": internal_acc,
-                "internal_recall": internal_recall,
-                "internal_kappa": internal_kappa,
-                "excluded_acc": excl_acc,
-                "excluded_recall": excl_recall,
-                "excluded_kappa": excl_kappa
-            })
-
-            print(f"Subject {subj}: internal_acc={internal_acc:.4f}, excluded_acc={excl_acc:.4f}")
+    all_results.extend(subj_results)
+    all_results.append(avg_row)
 
     df_results = pd.DataFrame(all_results)
     df_results.to_excel(output_excel, index=False)
