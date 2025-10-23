@@ -53,7 +53,7 @@ def main(args: argparse.Namespace) -> None:
 
     elif args.psd:
         print("running psd feature extraction")
-        apply_psd_pipeline(config)
+        apply_psd_pipeline(config, "Data/mixed/memd_imf_mixed_fs256_epoch2.5_len_6imfs_10000new.npz")
 
     elif args.train: 
         print("running training")
