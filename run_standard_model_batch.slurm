@@ -34,6 +34,7 @@ Psd_segmented_2s_epoch_256hz.npz
 Psd_segmented_30s_epoch_256hz.npz
 Psd_segmented_3s_epoch_256hz.npz
 Psd_segmented_5s_epoch_256hz.npz
+Psd_memd_imf_mixed_fs256_epoch2.5_len_6imfs_10000new.npz 
 )
 
 for f in "${files[@]}"; do
@@ -53,6 +54,6 @@ module load Anaconda3/2023.09-0
 source ~/.bashrc
 conda activate dream_env
 
-python src/main_standard_eval.py --file ${f}
+python src/main_models_eval.py --file ${f}
 EOF
 done
