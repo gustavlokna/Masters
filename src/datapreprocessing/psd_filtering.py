@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.signal import welch
-
+import os
 
 def load_data(npz_path):
     """Load preprocessed data from .npz file."""
@@ -61,14 +61,16 @@ def compute_psd_features(X, bands, fs):
     return features, band_names
 
 
-def apply_psd_pipeline(config: dict) -> None:
+def apply_psd_pipeline(config: dict, file_path) -> None:
     """Run full PSD pipeline: load, compute, save."""
-    input_path = config["data"]["preprocessed"]  # use preprocessed data
-    output_path = config["data"]["psd"]
+        # name output file after input npz
+    input_name = os.path.splitext(os.path.basename(file_path))[0]
+    output_path = f"Data/psd/Psd_{input_name}.npz"
+
     fs = config["data"]["fs"]
     bands = config["psd_bands"]
 
-    X, y, subject, sex , age= load_data(input_path)
+    X, y, subject, sex , age= load_data(file_path)
     X_psd, band_names = compute_psd_features(X, bands,fs) # shape (n_epochs, n_bands, n_channels)
     print(f"Computed PSD features with shape {X_psd.shape}")
     save_psd_data(output_path, X_psd, y, subject, sex,age,  band_names)
