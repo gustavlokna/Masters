@@ -11,10 +11,10 @@ def load_memd_data(npz_path):
     - subject: (n_segments,)
     """
     data = np.load(npz_path)
-    return data["X"], data["y"], data["subject"], data["sex"]
+    return data["X"], data["y"], data["subject"], data["sex"], data["age"]
 
 def load_all_memd_data(folder_path):
-    X_list, y_list, subject_list, sex_list = [], [], [], []
+    X_list, y_list, subject_list, sex_list, age_list = [], [], [], [], []
     files = [f for f in os.listdir(folder_path) if f.endswith(".npz")]
     max_imfs = 0
 
@@ -31,6 +31,7 @@ def load_all_memd_data(folder_path):
         y = np.atleast_1d(data["y"])
         subject = data["subject"]
         sex = np.atleast_1d(data["sex"])
+        age = np.atleast_1d(data["age"])
 
         # ensure subject is list-like (1D)
         if np.ndim(subject) == 0:
@@ -46,29 +47,32 @@ def load_all_memd_data(folder_path):
         y_list.append(y)
         subject_list.append(subject)
         sex_list.append(sex)
+        age_list.append(age)
         print(f"Loaded {file} with shape {X.shape}")
 
     X = np.concatenate(X_list, axis=0)
     y = np.concatenate(y_list, axis=0)
     subject = np.concatenate(subject_list, axis=0)
     sex = np.concatenate(sex_list, axis=0)
+    age = np.concatenate(age_list, axis=0)
     print(f"Total combined shape: {X.shape}")
-    return X, y, subject, sex
+    return X, y, subject, sex, age
 
-def save_mixed_data(output_path, X, y, subject, sex, synthetic_flag):
+def save_mixed_data(output_path, X, y, subject, sex, age, synthetic_flag):
     np.savez(
         output_path,
         X=X,
         y=y,
         subject=subject,
         sex=sex,
+        age=age,
         synthetic=synthetic_flag,
     )
     print(f"Saved mixed data to {output_path} with shape {X.shape}")
 
 
-def mix_imfs_channel_consistent(X, y, subject, sex, n_imfs=5, n_new=10000, filter_on_sex=False):
-    new_X, new_y, new_subject, new_sex, synthetic_flag = [], [], [], [], []
+def mix_imfs_channel_consistent(X, y, subject, sex, age, n_imfs=5, n_new=10000, filter_on_sex=False):
+    new_X, new_y, new_subject, new_sex, new_age, synthetic_flag = [], [], [], [], [], []
 
     n_segments, max_imfs, samples, channels = X.shape
     assert n_imfs <= max_imfs, "n_imfs exceeds available IMFs"
@@ -98,11 +102,16 @@ def mix_imfs_channel_consistent(X, y, subject, sex, n_imfs=5, n_new=10000, filte
 
         new_X.append(mixed[np.newaxis, :, :, :])
         new_y.append(y[chosen_idx[0]])
+
+        # choose representative sex and age
         if filter_on_sex:
             new_sex.append(sex[chosen_idx[0]])
+            new_age.append(age[chosen_idx[0]])
         else:
-            vals, counts = np.unique(sex[chosen_idx], return_counts=True)
-            new_sex.append(vals[np.argmax(counts)])
+            vals_sex, counts_sex = np.unique(sex[chosen_idx], return_counts=True)
+            new_sex.append(vals_sex[np.argmax(counts_sex)])
+            new_age.append(np.mean(age[chosen_idx]))  # average of mixed samples’ ages
+
         # instead of -1, tag with subjects used
         subj_ids = [str(subject[idx]) for idx in chosen_idx]
         new_subject.append(",".join(subj_ids))  # e.g. "s01,s07,s12,s15"
@@ -111,8 +120,9 @@ def mix_imfs_channel_consistent(X, y, subject, sex, n_imfs=5, n_new=10000, filte
     return (
         np.concatenate(new_X, axis=0),
         np.array(new_y),
-        np.array(new_subject),   # now strings of subjects
+        np.array(new_subject),
         np.array(new_sex),
+        np.array(new_age),
         np.array(synthetic_flag),
     )
 
@@ -129,9 +139,9 @@ def imf_mixing_pipeline(config: dict):
     fs = config["data"]["fs"]
     epoch_length = config["data"]["epoch_length"]
 
-    X, y, subject, sex = load_all_memd_data(folder_path)
-    X_new, y_new, subject_new, sex_new, synthetic_flag = mix_imfs_channel_consistent(
-        X, y, subject, sex, n_imfs=n_imfs, n_new=n_new, filter_on_sex=filter_on_sex
+    X, y, subject, sex, age = load_all_memd_data(folder_path)
+    X_new, y_new, subject_new, sex_new, age_new, synthetic_flag = mix_imfs_channel_consistent(
+        X, y, subject, sex, age, n_imfs=n_imfs, n_new=n_new, filter_on_sex=filter_on_sex
     )
 
     X_orig_reduced = np.sum(X[:, :n_imfs, :, :], axis=1)
@@ -141,10 +151,11 @@ def imf_mixing_pipeline(config: dict):
     y_all = np.concatenate([y, y_new], axis=0)
     subject_all = np.concatenate([subject, subject_new], axis=0)
     sex_all = np.concatenate([sex, sex_new], axis=0)
+    age_all = np.concatenate([age, age_new], axis=0)
     synthetic_all = np.concatenate([np.zeros(len(y), dtype=int), synthetic_flag], axis=0)
 
     filename = f"memd_imf_mixed_fs{fs}_epoch{epoch_length}_len_{n_imfs}imfs_{n_new}new.npz"
     output_path = os.path.join(base_output_dir, filename)
 
-    save_mixed_data(output_path, X_all, y_all, subject_all, sex_all, synthetic_all)
+    save_mixed_data(output_path, X_all, y_all, subject_all, sex_all, age_all, synthetic_all)
     print(f"Mixed data shape: {X_all.shape}, original samples: {len(y)}, synthetic samples: {len(y_new)}")
