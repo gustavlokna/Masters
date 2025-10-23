@@ -4,7 +4,7 @@ import os
 
 def load_data(npz_path):
     """Load preprocessed data from .npz file."""
-    data = np.load(npz_path)
+    data = np.load(npz_path, allow_pickle=True)
     return data["X"], data["y"], data["subject"], data["sex"], data["age"]
 
 def save_psd_data(output_path, X_psd, y, subject, sex, age, band_names):
