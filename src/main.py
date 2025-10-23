@@ -61,7 +61,7 @@ def main(args: argparse.Namespace) -> None:
         
     elif args.dev: 
         print("development mode")
-        test_deep_conv(config, "Data/mixed_data/memd_imf_mixed_fs256_epoch2.5_len_6imfs_10000new.npz")
+        test_deep_conv(config, "Data/mixed/memd_imf_mixed_fs256_epoch2.5_len_6imfs_10000new.npz")
     else:
         print("No valid arguments provided. Use --help for usage information.")
 
