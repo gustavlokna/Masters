@@ -12,6 +12,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.optimizers import Adam
 import xgboost as xgb
+import os
 
 
 def model_mlp(input_dim, X_train, y_train, X_test):
@@ -165,18 +166,20 @@ def balance_train_classes(X_train, y_train):
 
     return X_balanced, y_balanced
 
-def models_eval(config):
-    npz_path = config["data"]["psd"]
-    output_excel = f"{npz_path.rsplit('/', 1)[-1].replace('.npz', '')}_results.xlsx"
+def models_eval(config, file_path):
+
+
     
-    X, y, subject, band_names, sex ,age= load_psd_data(config["data"]["psd"])
+    X, y, subject, band_names, sex ,age= load_psd_data(file_path)
     #X = add_sex_age_features(X, sex, age) 
     all_results = []
-     #["MLP", "KNN", "SVC", "LogisticRegression", "RandomForest", "XGBoost"]
+
+    #["MLP", "KNN", "SVC", "LogisticRegression", "RandomForest", "XGBoost"]
     model_types = ["KNN", "SVC", "LogisticRegression", "RandomForest", "XGBoost"]
 
     for map_name, label_map in config["label_maps"].items():
         print(f"\n=== Running label map: {map_name} ===")
+
         X_filtered, y_filtered = prepare_data(X, y, label_map)
         subj_filtered = np.array(subject)[[label_map.get(lbl, None) is not None for lbl in y]]
 
@@ -205,8 +208,8 @@ def models_eval(config):
             subjects = np.unique(subj_filtered)
 
             for subj in subjects:
-                train_mask = subj_filtered != subj
-                test_mask = subj_filtered == subj
+                train_mask = np.array([subj not in str(s) for s in subject]) # written this difficulte to have the opertunity to exclude synthetic samples
+                test_mask = np.array([str(s) == str(subj) for s in subject])
 
                 X_train_subj = X_filtered[train_mask]
                 y_train_subj = y_filtered[train_mask]
@@ -270,6 +273,11 @@ def models_eval(config):
             all_results.extend(subj_results)
             all_results.append(avg_row)
 
+    # name output file after input npz
+    input_name = os.path.splitext(os.path.basename(file_path))[0]
+    output_path = f"model_eval/standard_models/loso_eval_{input_name}_loaded.xlsx"
+
+
     df_results = pd.DataFrame(all_results)
-    df_results.to_excel(output_excel, index=False)
-    print(f"\nResults saved to {output_excel}")
+    df_results.to_excel(output_path, index=False)
+    print(f"\nResults saved to {output_path}")
