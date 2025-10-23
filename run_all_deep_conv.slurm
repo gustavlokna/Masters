@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --account=share-ie-idi
-#SBATCH --job-name=segmented_10s_epoch_256hz       # ✅ Job name  
+#SBATCH --job-name=deepconv_batch       # ✅ Job name  
 #SBATCH --time=1:00:00
 
 #SBATCH --partition=GPUQ

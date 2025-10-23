@@ -35,8 +35,7 @@ def load_raw_data(npz_path, config):
     print(f"Loaded RAW data: X={X.shape}, y={y.shape}")
 
     #selected = np.array(config["channels"]["top_64"]) - 1
-    # = X[:, :, selected]
-    X = np.transpose(X, (0, 2, 1))
+    #X = np.transpose(X, (0, 2, 1))
     X = np.expand_dims(X, axis=-1)
 
     return X, y, subject, sex, age
@@ -119,8 +118,8 @@ def test_deep_conv(config, file_path):
     subjects = np.unique(subject)
     subj_results = []
     for subj in subjects:
-        train_mask = subject != subj
-        test_mask = subject == subj
+        train_mask = np.array([subj not in str(s) for s in subject]) # written this difficulte to have the opertunity to exclude synthetic samples
+        test_mask = np.array([str(s) == str(subj) for s in subject])
 
         X_train_subj = X[train_mask]
         y_train_subj = y_cat[train_mask]
@@ -192,7 +191,7 @@ def test_deep_conv(config, file_path):
     all_results.append(avg_row)
 
     # name output file after input npz
-    input_name = os.path.splitext(os.path.basename(config["data"]["preprocessed"]))[0]
+    input_name = os.path.splitext(os.path.basename(file_path))[0]
     output_path = f"model_eval/loso_eval_{input_name}_loaded.xlsx"
 
     df_results = pd.DataFrame(all_results)

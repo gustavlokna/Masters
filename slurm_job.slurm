@@ -1,14 +1,14 @@
 #!/bin/bash
 #SBATCH --account=share-ie-idi
-#SBATCH --job-name=segmented_10s_epoch_256hz       # ✅ Job name  
+#SBATCH --job-name=imf_node_mixing       # ✅ Job name  
 #SBATCH --time=240:00:00
 
 #SBATCH --partition=GPUQ
 #SBATCH --gres=gpu:1
 #SBATCH --mem=600G
 #SBATCH --nodes=1
-#SBATCH --output=logs/segmented_10s_epoch_256hz_out.txt         # ✅ Output file
-#SBATCH --error=logs/segmented_10s_epoch_256hz_err.txt          # ✅ Error file
+#SBATCH --output=logs/imf_node_mixing_out.txt         # ✅ Output file
+#SBATCH --error=logs/imf_node_mixing_err.txt          # ✅ Error file
 
 #SBATCH --mail-user=gustal@stud.ntnu.no
 #SBATCH --mail-type=ALL
