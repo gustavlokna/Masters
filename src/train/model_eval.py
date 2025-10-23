@@ -208,8 +208,8 @@ def models_eval(config, file_path):
             subjects = np.unique(subj_filtered)
 
             for subj in subjects:
-                train_mask = np.array([subj not in str(s) for s in subject]) # written this difficulte to have the opertunity to exclude synthetic samples
-                test_mask = np.array([str(s) == str(subj) for s in subject])
+                train_mask = np.array([subj not in str(s) for s in subj_filtered]) # written this difficulte to have the opertunity to exclude synthetic samples
+                test_mask = np.array([str(s) == str(subj) for s in subj_filtered])
 
                 X_train_subj = X_filtered[train_mask]
                 y_train_subj = y_filtered[train_mask]
