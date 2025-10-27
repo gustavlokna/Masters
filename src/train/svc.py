@@ -164,7 +164,7 @@ def SVC_tetsing(config, file_path):
     all_results = []
 
     #["KNN", "SVC", "LogisticRegression", "RandomForest", "XGBoost"]
-    model_types = ["SVC"]
+    model_types =["KNN", "SVC", "LogisticRegression", "RandomForest", "XGBoost"]
 
     X_filtered, y_filtered = prepare_data(X, y)
 
@@ -187,6 +187,7 @@ def SVC_tetsing(config, file_path):
 
         subjects = np.unique(subject)
         subj_results = []
+        """"
         for subj in subjects:
             train_mask = np.array([subj not in str(s) for s in subject]) # written this difficulte to have the opertunity to exclude synthetic samples
             test_mask = np.array([str(s) == str(subj) for s in subject])
@@ -247,10 +248,20 @@ def SVC_tetsing(config, file_path):
 
         all_results.extend(subj_results)
         all_results.append(avg_row)
+        """
+        avg_row = {
+            "model_type": model_type,
+            "label_map": "1,2,3",
+            "subject": "average",
+            "baseline_acc": base_acc,
+            "baseline_recall":base_recall,
+            "baseline_kappa": base_kappa,
+        }
 
+        all_results.append(avg_row)
     # name output file after input npz
     input_name = os.path.splitext(os.path.basename(file_path))[0]
-    output_path = f"model_eval/standard_models/loso_eval_{input_name}_loaded.xlsx"
+    output_path = f"model_eval/standard_models/threelabel_eval_{input_name}_loaded.xlsx"
 
 
     df_results = pd.DataFrame(all_results)
