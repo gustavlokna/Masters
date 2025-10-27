@@ -198,7 +198,6 @@ def csp_testing(config, file_path):
                 "excluded_kappa": subj_df["excluded_kappa"].mean(),
             }
             """
-            subj_df = pd.DataFrame(subj_results)
             avg_row = {
                 "model_type": model_type,
                 "label_map": map_name,
