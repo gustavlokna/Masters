@@ -19,7 +19,7 @@ def main(args: argparse.Namespace) -> None:
 
 def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run DeepConvNet evaluation for one dataset file")
-    parser.add_argument("--file", required=True, help="Filename (inside Data/processed) to evaluate")
+    parser.add_argument("--file", required=True, help="Filename (inside Data/) to evaluate")
     return parser.parse_args()
 
 

@@ -9,6 +9,7 @@ from train.subject_importance import leave_one_subject_out_pipeline
 from train.loso_eeg import eeg_loso, test_all_3_labels
 from train.model_eval import models_eval
 from train.deepConv import test_deep_conv
+from train.svc import SVC_tetsing
 def main(args: argparse.Namespace) -> None:
     """
     Main function for the ML Piple
@@ -61,7 +62,7 @@ def main(args: argparse.Namespace) -> None:
         
     elif args.dev: 
         print("development mode")
-        test_deep_conv(config, "Data/mixed/memd_imf_mixed_fs256_epoch2.5_len_6imfs_10000new.npz")
+        SVC_tetsing(config, "Data/psd/Psd_segmented_25s_epoch_256hz.npz")
     else:
         print("No valid arguments provided. Use --help for usage information.")
 
