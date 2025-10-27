@@ -5,7 +5,6 @@ from datapreprocessing.preprocessing import preprocessing
 from datapreprocessing.memd_filtering import apply_memd_pipeline
 from datapreprocessing.psd_filtering import apply_psd_pipeline
 from datapreprocessing.syntetic_imf import imf_mixing_pipeline
-from train.subject_importance import leave_one_subject_out_pipeline
 from train.loso_eeg import eeg_loso, test_all_3_labels
 from train.model_eval import models_eval
 from train.deepConv import test_deep_conv
