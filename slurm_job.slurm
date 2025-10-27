@@ -1,14 +1,14 @@
 #!/bin/bash
 #SBATCH --account=share-ie-idi
-#SBATCH --job-name=imf_node_mixing_psd       # ✅ Job name  
+#SBATCH --job-name=SVC_testing_2       # ✅ Job name  
 #SBATCH --time=240:00:00
 
 #SBATCH --partition=GPUQ
 #SBATCH --gres=gpu:1
 #SBATCH --mem=600G
 #SBATCH --nodes=1
-#SBATCH --output=logs/imf_node_mixing_psd_out.txt         # ✅ Output file
-#SBATCH --error=logs/imf_node_mixing_psd_err.txt          # ✅ Error file
+#SBATCH --output=logs/SVC_testing_out.txt         # ✅ Output file
+#SBATCH --error=logs/SVC_testing_err.txt          # ✅ Error file
 
 #SBATCH --mail-user=gustal@stud.ntnu.no
 #SBATCH --mail-type=ALL
@@ -27,4 +27,4 @@ module load Anaconda3/2023.09-0
 source ~/.bashrc
 conda activate dream_env
 
-python src/main.py --psd
+python src/main.py --dev
