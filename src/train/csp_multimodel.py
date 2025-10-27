@@ -133,7 +133,7 @@ def csp_testing(config, file_path):
 
             subj_results = []
             subjects = np.unique(subj_filtered)
-
+            """
             for subj in subjects:
                 train_mask = np.array([subj not in str(s) for s in subj_filtered])
                 test_mask = np.array([str(s) == str(subj) for s in subj_filtered])
@@ -197,7 +197,16 @@ def csp_testing(config, file_path):
                 "excluded_recall": subj_df["excluded_recall"].mean(),
                 "excluded_kappa": subj_df["excluded_kappa"].mean(),
             }
-
+            """
+            subj_df = pd.DataFrame(subj_results)
+            avg_row = {
+                "model_type": model_type,
+                "label_map": map_name,
+                "subject": "average",
+                "baseline_acc": base_acc,
+                "baseline_recall": base_recall, 
+                "baseline_kappa": base_kappa,
+            }
             all_results.extend(subj_results)
             all_results.append(avg_row)
 
