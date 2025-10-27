@@ -1,14 +1,14 @@
 #!/bin/bash
 #SBATCH --account=share-ie-idi
-#SBATCH --job-name=SVC_testing_2       # ✅ Job name  
+#SBATCH --job-name=CSP_test       # ✅ Job name  
 #SBATCH --time=240:00:00
 
 #SBATCH --partition=GPUQ
 #SBATCH --gres=gpu:1
 #SBATCH --mem=600G
 #SBATCH --nodes=1
-#SBATCH --output=logs/SVC_testing_out.txt         # ✅ Output file
-#SBATCH --error=logs/SVC_testing_err.txt          # ✅ Error file
+#SBATCH --output=logs/CSP_test_out.txt         # ✅ Output file
+#SBATCH --error=logs/CSP_test_err.txt          # ✅ Error file
 
 #SBATCH --mail-user=gustal@stud.ntnu.no
 #SBATCH --mail-type=ALL

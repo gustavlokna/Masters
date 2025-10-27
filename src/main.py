@@ -9,6 +9,8 @@ from train.loso_eeg import eeg_loso, test_all_3_labels
 from train.model_eval import models_eval
 from train.deepConv import test_deep_conv
 from train.svc import SVC_tetsing
+from train.csp_multimodel import csp_testing
+
 def main(args: argparse.Namespace) -> None:
     """
     Main function for the ML Piple
@@ -57,11 +59,11 @@ def main(args: argparse.Namespace) -> None:
 
     elif args.train: 
         print("running training")
-        leave_one_subject_out_pipeline(config)
+        #leave_one_subject_out_pipeline(config)
         
     elif args.dev: 
         print("development mode")
-        SVC_tetsing(config, "Data/psd/Psd_segmented_25s_epoch_256hz.npz")
+        csp_testing(config, "Data/psd/Psd_segmented_2.5s_epoch_256hz.npz")
     else:
         print("No valid arguments provided. Use --help for usage information.")
 

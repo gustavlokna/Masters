@@ -162,7 +162,7 @@ def SVC_tetsing(config, file_path):
     all_results = []
 
     #["KNN", "SVC", "LogisticRegression", "RandomForest", "XGBoost"]
-    model_types =["KNN", "SVC", "LogisticRegression", "RandomForest", "XGBoost"]
+    model_types =["SVC", "LogisticRegression", "RandomForest", "XGBoost"]
 
     X_filtered, y_filtered = prepare_data(X, y)
 
