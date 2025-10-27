@@ -210,7 +210,7 @@ def csp_testing(config, file_path):
             all_results.append(avg_row)
 
     input_name = os.path.splitext(os.path.basename(file_path))[0]
-    output_path = f"model_eval/csp/csp_eval_{input_name}_loaded.xlsx"
+    output_path = f"model_eval/csp/non_psd_csp_eval_{input_name}_loaded.xlsx"
 
     df_results = pd.DataFrame(all_results)
     df_results.to_excel(output_path, index=False)
