@@ -51,7 +51,6 @@ def train_model(model_type, X_train, y_train):
             tree_method='hist',
             device='cuda'
         )
-
     elif model_type == "KNN":
         model = KNeighborsClassifier(n_neighbors=10) #was 5
 
@@ -67,8 +66,7 @@ def train_model(model_type, X_train, y_train):
     else:
         raise ValueError(f"Unknown model type: {model_type}")
 
-    if model_type != "XGBoost":
-        model.fit(X_train, y_train)
+    model.fit(X_train, y_train)
 
     return model
 
