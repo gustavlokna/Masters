@@ -117,7 +117,7 @@ def csp_testing(config, file_path):
         X_train_csp_input = X_train.transpose(0, 2, 1)
         X_test_csp_input = X_test.transpose(0, 2, 1)
 
-        csp = CSP(n_components=6, log=True)
+        csp = CSP(n_components=64, log=True)
         X_train = csp.fit_transform(X_train_csp_input, y_train)
         X_test = csp.transform(X_test_csp_input)
 
