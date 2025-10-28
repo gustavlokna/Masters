@@ -10,7 +10,7 @@ source ~/.bashrc
 conda activate dream_env
 
 mkdir -p logs
-
+"""
 combos=(
 "0"
 "1"
@@ -76,7 +76,10 @@ combos=(
 "1 2 3 4 5"
 "0 1 2 3 4 5"
 )
-
+"""
+combos=(
+"0 1 2"
+)
 for combo in "${combos[@]}"; do
   name="imf_${combo// /_}"
   sbatch <<EOF
@@ -85,7 +88,7 @@ for combo in "${combos[@]}"; do
 #SBATCH --job-name=${name}
 #SBATCH --partition=GPUQ
 #SBATCH --gres=gpu:1
-#SBATCH --mem=160G
+#SBATCH --mem=600G
 #SBATCH --time=200:00:00
 #SBATCH --output=logs/${name}.out
 #SBATCH --error=logs/${name}.err
