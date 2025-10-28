@@ -10,7 +10,7 @@ source ~/.bashrc
 conda activate dream_env
 
 mkdir -p logs
-"""
+
 combos=(
 "0"
 "1"
@@ -76,10 +76,7 @@ combos=(
 "1 2 3 4 5"
 "0 1 2 3 4 5"
 )
-"""
-combos=(
-"0 1 2"
-)
+
 for combo in "${combos[@]}"; do
   name="imf_${combo// /_}"
   sbatch <<EOF
