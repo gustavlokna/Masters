@@ -1,14 +1,14 @@
 #!/bin/bash
 #SBATCH --account=share-ie-idi
-#SBATCH --job-name=CSP_test_non_psd      # ✅ Job name  
+#SBATCH --job-name=Imf_permutations      # ✅ Job name  
 #SBATCH --time=240:00:00
 
 #SBATCH --partition=GPUQ
 #SBATCH --gres=gpu:1
 #SBATCH --mem=600G
 #SBATCH --nodes=1
-#SBATCH --output=logs/CSP_test_non_psd_out.txt         # ✅ Output file
-#SBATCH --error=logs/CSP_test_non_psd_err.txt          # ✅ Error file
+#SBATCH --output=logs/Imf_permutations_out.txt         # ✅ Output file
+#SBATCH --error=logs/Imf_permutations_err.txt          # ✅ Error file
 
 #SBATCH --mail-user=gustal@stud.ntnu.no
 #SBATCH --mail-type=ALL
