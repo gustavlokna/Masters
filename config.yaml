@@ -6,6 +6,7 @@ data:
   memd_single_band: Data/memd
   memd: "Data/processed/memd_segmented_2.5s_epoch_256hz_ALLCHANNELS_512_dir.npz" # Combined MEMD filtered data from all subjects
   mixed: Data/mixed
+  imfs_permutation: Data/imfs_permutation
   psd: Data/psd # Combined PSD features from all subjects
   fs: 256  # Target sampling frequency after downsampling
   epoch_length: 2.5 # Length of each epoch in seconds

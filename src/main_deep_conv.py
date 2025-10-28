@@ -10,7 +10,7 @@ def main(args: argparse.Namespace) -> None:
     Main function to run DeepConvNet evaluation for a single .npz file in parallel on Idun.
     """
     config: dict[str, Any] = read_config()
-    root_path = config["data"]["processed"]
+    root_path = config["data"]["imfs_permutation"]
     file_path = os.path.join(root_path, args.file)
 
     print(f"Running DeepConvNet evaluation for file {file_path}")

@@ -9,6 +9,9 @@ from tensorflow.keras.optimizers import Adam
 import tensorflow as tf
 import os
 from utilities.EEGNet import DeepConvNet
+import numpy as np
+import os
+import itertools
 
 # Enable GPU usage
 gpus = tf.config.list_physical_devices('GPU')
@@ -22,31 +25,6 @@ if gpus:
         print(e)
 else:
     print("No GPU found. Running on CPU.")
-
-
-def load_raw_data(npz_path, config):
-    data = np.load(npz_path, allow_pickle=True)
-    X = data["X"]
-    y = data["y"]
-    subject = data["subject"]
-    sex = data["sex"]
-    age = data["age"]
-
-    print(f"Loaded RAW data: X={X.shape}, y={y.shape}")
-
-    selected = np.array(config["channels"]["top_64"]) - 1
-    X = X[:, :, selected]
-    X = np.transpose(X, (0, 2, 1))
-    X = np.expand_dims(X, axis=-1)
-
-    return X, y, subject, sex, age
-
-
-def prepare_data(X, y, label_map):
-    mask = np.array([label_map.get(lbl, None) is not None for lbl in y])
-    X_filtered = X[mask]
-    y_filtered = np.array([label_map[lbl] for lbl in y[mask]], dtype=int)
-    return X_filtered, y_filtered
 
 
 def balance_classes(X, y):
@@ -85,9 +63,7 @@ def evaluate_model(model, X_test, y_test):
     return acc, recall, kappa
 
 
-def test_deep_conv(config, file_path):
-    X, y, subject, sex, age = load_raw_data(file_path, config)
-
+def train_model(config,  X, y, subject, sex, age, imf_name):
     all_results = []
 
     nb_classes = len(np.unique(y))
@@ -200,9 +176,13 @@ def test_deep_conv(config, file_path):
 
     all_results.append(avg_row)
     # name output file after input npz
-    input_name = os.path.splitext(os.path.basename(file_path))[0]
-    output_path = f"model_eval/loso_eval_{input_name}_loaded.xlsx"
+    
+    os.makedirs("model_eval/imf_permutation", exist_ok=True)
+    name = "_".join(map(str, imf_name))
+    output_path = f"model_eval/imf_permutation/{name}_loaded.xlsx"
 
     df_results = pd.DataFrame(all_results)
     df_results.to_excel(output_path, index=False)
     print(f"\nResults saved to {output_path}")
+
+

@@ -35,8 +35,10 @@ def load_raw_data(npz_path, config):
 
     print(f"Loaded RAW data: X={X.shape}, y={y.shape}")
 
-    #selected = np.array(config["channels"]["top_64"]) - 1
-    #X = np.transpose(X, (0, 2, 1))
+    selected = np.array(config["channels"]["top_64"]) - 1
+    X = X[:, :, selected]
+    
+    X = np.transpose(X, (0, 2, 1))
     X = np.expand_dims(X, axis=-1)
 
     return X, y, subject, sex, age
