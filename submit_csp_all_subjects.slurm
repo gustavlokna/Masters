@@ -1,12 +1,12 @@
 #!/bin/bash
 #SBATCH --account=share-ie-idi
-#SBATCH --job-name=segmented_15s_epoch_256hz_csp_batch
+#SBATCH --job-name=segmented_1s_epoch_256hz_csp_batch
 #SBATCH --time=72:00:00
 #SBATCH --partition=GPUQ
 #SBATCH --mem=50G
 #SBATCH --nodes=1
-#SBATCH --output=logs/segmented_15s_epoch_256hz_csp_batch_out.txt
-#SBATCH --error=logs/segmented_15s_epoch_256hz_csp_batch_err.txt
+#SBATCH --output=logs/segmented_1s_epoch_256hz_csp_batch_out.txt
+#SBATCH --error=logs/segmented_1s_epoch_256hz_csp_batch_err.txt
 
 module purge
 module load Anaconda3/2023.09-0
