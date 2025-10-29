@@ -89,127 +89,133 @@ def evaluate_model(model, X_test, y_test):
 
 
 def csp_testing(config, file_path,n_csp_components = 64):
-    X_raw, y, subject, sex, age = load_raw_data(file_path, config)
+    X_raw, y_raw, subject, sex, age = load_raw_data(file_path, config)
 
-    nb_classes = len(np.unique(y))
-    y_cat = to_categorical(y, nb_classes)
+    all_results = []
+    for map_name, label_map in config["label_maps"].items():
+        print(f"\n=== Running label map: {map_name} ===")
 
-    # 70/30 split on raw first
-    X_train, X_test, y_train, y_test = train_test_split(
-        X_raw, y, test_size=0.3, stratify=y, random_state=42
-    )
+        X, y = prepare_data(X_raw, y_raw, label_map)
+        subj_filtered = np.array(subject)[[label_map.get(lbl, None) is not None for lbl in y_raw]]
+        subjects = np.unique(subj_filtered)
+        nb_classes = len(np.unique(y))
 
-    # standardize train then transform test
-    scaler = StandardScaler()
-    X_train_flat = X_train.reshape(X_train.shape[0], -1)
-    X_test_flat = X_test.reshape(X_test.shape[0], -1)
-    X_train_scaled = scaler.fit_transform(X_train_flat).reshape(X_train.shape)
-    X_test_scaled = scaler.transform(X_test_flat).reshape(X_test.shape)
-
-    # CSP input reshape
-    X_train_csp_in = X_train_scaled.squeeze(-1).transpose(0, 2, 1)
-    X_test_csp_in = X_test_scaled.squeeze(-1).transpose(0, 2, 1)
-
-    # CSP fit on train only
-    csp = CSP(n_components=n_csp_components, log=True, reg='ledoit_wolf')
-    X_train_csp = csp.fit_transform(X_train_csp_in, y_train)
-    X_test_csp = csp.transform(X_test_csp_in)
-
-    # reshape to (samples, comps, 1, 1)
-    X_train_csp = X_train_csp.reshape(X_train_csp.shape[0], n_csp_components, 1, 1)
-    X_test_csp = X_test_csp.reshape(X_test_csp.shape[0], n_csp_components, 1, 1)
-
-    print("=== Training baseline ===")
-    model = train_deep_eegnet(X_train_csp, y_train, nb_classes)
-    base_acc, base_recall, base_kappa = evaluate_model(model, X_test_csp, y_test)
-    """
-    subjects = np.unique(subject)
-    subj_results = []
-    for subj in subjects:
-        train_mask = np.array([subj not in str(s) for s in subject]) # written this difficulte to have the opertunity to exclude synthetic samples
-        test_mask = np.array([str(s) == str(subj) for s in subject])
-
-        X_train_subj = X[train_mask]
-        y_train_subj = y_cat[train_mask]
-        X_val_subj = X[test_mask]
-        y_val_subj = y_cat[test_mask]
-
-        y_train_subj_labels = np.argmax(y_train_subj, axis=1)
-
-        X_tr, X_te, y_tr, y_te = train_test_split(
-            X_train_subj, y_train_subj, test_size=0.3,
-            stratify=y_train_subj_labels, random_state=42
+        # 70/30 split on raw first
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.3, stratify=y, random_state=42
         )
-        X_tr, y_tr = balance_classes(X_tr, y_tr)
 
-        # CSP on subject-wise training
-        X_tr_csp_input = X_tr.squeeze(-1).transpose(0, 2, 1)
-        X_te_csp_input = X_te.squeeze(-1).transpose(0, 2, 1)
-        X_val_csp_input = X_val_subj.squeeze(-1).transpose(0, 2, 1)
-
-        csp = CSP(n_components=n_csp_components, log=True)
-        X_tr_csp = csp.fit_transform(X_tr_csp_input, np.argmax(y_tr, axis=1))
-        X_te_csp = csp.transform(X_te_csp_input)
-        X_val_csp = csp.transform(X_val_csp_input)
-
-        # Reshape CSP outputs
-        X_tr_csp = X_tr_csp.reshape(X_tr_csp.shape[0], n_csp_components, 1, 1)
-        X_te_csp = X_te_csp.reshape(X_te_csp.shape[0], n_csp_components, 1, 1)
-        X_val_csp = X_val_csp.reshape(X_val_csp.shape[0], n_csp_components, 1, 1)
-
-        # Scaling
+        # standardize train then transform test
         scaler = StandardScaler()
-        X_tr_scaled = scaler.fit_transform(X_tr_csp.reshape(X_tr_csp.shape[0], -1)).reshape(X_tr_csp.shape)
-        X_te_scaled = scaler.transform(X_te_csp.reshape(X_te_csp.shape[0], -1)).reshape(X_te_csp.shape)
-        X_val_scaled = scaler.transform(X_val_csp.reshape(X_val_csp.shape[0], -1)).reshape(X_val_csp.shape)
+        X_train_flat = X_train.reshape(X_train.shape[0], -1)
+        X_test_flat = X_test.reshape(X_test.shape[0], -1)
+        X_train_scaled = scaler.fit_transform(X_train_flat).reshape(X_train.shape)
+        X_test_scaled = scaler.transform(X_test_flat).reshape(X_test.shape)
 
-        model = train_deep_eegnet(X_tr_scaled, y_tr, nb_classes)
-        internal_acc, internal_recall, internal_kappa = evaluate_model(model, X_te_scaled, y_te)
-        excl_acc, excl_recall, excl_kappa = evaluate_model(model, X_val_scaled, y_val_subj)
+        # CSP input reshape
+        X_train_csp_in = X_train_scaled.squeeze(-1).transpose(0, 2, 1)
+        X_test_csp_in = X_test_scaled.squeeze(-1).transpose(0, 2, 1)
 
-        subj_results.append({
+        # CSP fit on train only
+        csp = CSP(n_components=n_csp_components, log=True, reg='ledoit_wolf')
+        X_train_csp = csp.fit_transform(X_train_csp_in, y_train)
+        X_test_csp = csp.transform(X_test_csp_in)
+
+        # reshape to (samples, comps, 1, 1)
+        X_train_csp = X_train_csp.reshape(X_train_csp.shape[0], n_csp_components, 1, 1)
+        X_test_csp = X_test_csp.reshape(X_test_csp.shape[0], n_csp_components, 1, 1)
+
+
+        print("=== Training baseline ===")
+        model = train_deep_eegnet(X_train_csp, y_train, nb_classes)
+        base_acc, base_recall, base_kappa = evaluate_model(model, X_test_csp, y_test)
+        """
+        subj_results = []
+        for subj in np.unique(subjects):
+            train_mask = np.array([subj not in str(s) for s in subj_filtered])
+            test_mask = np.array([str(s) == str(subj) for s in subj_filtered])
+
+            X_train_subj = X[train_mask]
+            y_train_subj = y_cat[train_mask]
+            X_val_subj = X[test_mask]
+            y_val_subj = y_cat[test_mask]
+
+            y_train_subj_labels = np.argmax(y_train_subj, axis=1)
+
+            X_tr, X_te, y_tr, y_te = train_test_split(
+                X_train_subj, y_train_subj, test_size=0.3,
+                stratify=y_train_subj_labels, random_state=42
+            )
+            X_tr, y_tr = balance_classes(X_tr, y_tr)
+
+            # CSP on subject-wise training
+            X_tr_csp_input = X_tr.squeeze(-1).transpose(0, 2, 1)
+            X_te_csp_input = X_te.squeeze(-1).transpose(0, 2, 1)
+            X_val_csp_input = X_val_subj.squeeze(-1).transpose(0, 2, 1)
+
+            csp = CSP(n_components=n_csp_components, log=True)
+            X_tr_csp = csp.fit_transform(X_tr_csp_input, np.argmax(y_tr, axis=1))
+            X_te_csp = csp.transform(X_te_csp_input)
+            X_val_csp = csp.transform(X_val_csp_input)
+
+            # Reshape CSP outputs
+            X_tr_csp = X_tr_csp.reshape(X_tr_csp.shape[0], n_csp_components, 1, 1)
+            X_te_csp = X_te_csp.reshape(X_te_csp.shape[0], n_csp_components, 1, 1)
+            X_val_csp = X_val_csp.reshape(X_val_csp.shape[0], n_csp_components, 1, 1)
+
+            # Scaling
+            scaler = StandardScaler()
+            X_tr_scaled = scaler.fit_transform(X_tr_csp.reshape(X_tr_csp.shape[0], -1)).reshape(X_tr_csp.shape)
+            X_te_scaled = scaler.transform(X_te_csp.reshape(X_te_csp.shape[0], -1)).reshape(X_te_csp.shape)
+            X_val_scaled = scaler.transform(X_val_csp.reshape(X_val_csp.shape[0], -1)).reshape(X_val_csp.shape)
+
+            model = train_deep_eegnet(X_tr_scaled, y_tr, nb_classes)
+            internal_acc, internal_recall, internal_kappa = evaluate_model(model, X_te_scaled, y_te)
+            excl_acc, excl_recall, excl_kappa = evaluate_model(model, X_val_scaled, y_val_subj)
+
+            subj_results.append({
+                "model_type": "DeepConvNet+CSP",
+                "label_map": map_name,
+                "subject": subj,
+                "baseline_acc": base_acc,
+                "baseline_recall": base_recall,
+                "baseline_kappa": base_kappa,
+                "internal_acc": internal_acc,
+                "internal_recall": internal_recall,
+                "internal_kappa": internal_kappa,
+                "excluded_acc": excl_acc,
+                "excluded_recall": excl_recall,
+                "excluded_kappa": excl_kappa
+            })
+
+        # average across subjects
+        subj_df = pd.DataFrame(subj_results)
+        avg_row = {
             "model_type": "DeepConvNet+CSP",
             "label_map": map_name,
-            "subject": subj,
+            "subject": "average",
+            "baseline_acc": subj_df["baseline_acc"].mean(),
+            "baseline_recall": subj_df["baseline_recall"].mean(),
+            "baseline_kappa": subj_df["baseline_kappa"].mean(),
+            "internal_acc": subj_df["internal_acc"].mean(),
+            "internal_recall": subj_df["internal_recall"].mean(),
+            "internal_kappa": subj_df["internal_kappa"].mean(),
+            "excluded_acc": subj_df["excluded_acc"].mean(),
+            "excluded_recall": subj_df["excluded_recall"].mean(),
+            "excluded_kappa": subj_df["excluded_kappa"].mean(),
+        }
+
+        all_results.extend(subj_results)
+        """
+        avg_row = {
+            "model_type": "DeepConvNet+CSP",
+            "label_map": map_name,
+            "subject": "average",
             "baseline_acc": base_acc,
             "baseline_recall": base_recall,
             "baseline_kappa": base_kappa,
-            "internal_acc": internal_acc,
-            "internal_recall": internal_recall,
-            "internal_kappa": internal_kappa,
-            "excluded_acc": excl_acc,
-            "excluded_recall": excl_recall,
-            "excluded_kappa": excl_kappa
-        })
-
-    # average across subjects
-    subj_df = pd.DataFrame(subj_results)
-    avg_row = {
-        "model_type": "DeepConvNet+CSP",
-        "label_map": map_name,
-        "subject": "average",
-        "baseline_acc": subj_df["baseline_acc"].mean(),
-        "baseline_recall": subj_df["baseline_recall"].mean(),
-        "baseline_kappa": subj_df["baseline_kappa"].mean(),
-        "internal_acc": subj_df["internal_acc"].mean(),
-        "internal_recall": subj_df["internal_recall"].mean(),
-        "internal_kappa": subj_df["internal_kappa"].mean(),
-        "excluded_acc": subj_df["excluded_acc"].mean(),
-        "excluded_recall": subj_df["excluded_recall"].mean(),
-        "excluded_kappa": subj_df["excluded_kappa"].mean(),
-    }
-
-    all_results.extend(subj_results)
-    """
-    avg_row = {
-        "model_type": "DeepConvNet+CSP",
-        "label_map": map_name,
-        "subject": "average",
-        "baseline_acc": base_acc,
-        "baseline_recall": base_recall,
-        "baseline_kappa": base_kappa,
-    }
-    all_results.append(avg_row)
+        }
+        all_results.append(avg_row)
 
     input_name = os.path.splitext(os.path.basename(file_path))[0]
     output_path = f"model_eval/csp/csp_deep_conv_{input_name}_with_n_csp_components_{n_csp_components}.xlsx"
