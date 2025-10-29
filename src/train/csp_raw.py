@@ -218,6 +218,6 @@ def csp_testing(config, file_path,n_csp_components = 64):
         all_results.append(avg_row)
 
     input_name = os.path.splitext(os.path.basename(file_path))[0]
-    output_path = f"model_eval/csp/csp_deep_conv_{input_name}_with_n_csp_components_{n_csp_components}.xlsx"
+    output_path = f"model_eval/csp/csp_deep_conv_multilabel_{input_name}_with_n_csp_components_{n_csp_components}.xlsx"
     pd.DataFrame(all_results).to_excel(output_path, index=False)
     print(f"\nResults saved to {output_path}")
