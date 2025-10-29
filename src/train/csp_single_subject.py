@@ -63,24 +63,33 @@ def get_model(model_type, num_classes):
     else:
         raise ValueError(f"Unknown model type: {model_type}")
 
-def test_csp_models_subject(config, file_path ,subject_id, n_csp_components=256):
+def test_csp_models_subject(config, file_path, subject_id, n_csp_components=256):
     X_raw, y_raw, subject, sex, age = load_raw_data(file_path, config)
-
-    train_mask = np.array(subject) != subject_id
-    test_mask = np.array(subject) == subject_id
 
     model_types = ["SVC", "XGBoost"]
     all_results = []
 
     for map_name, label_map in config["label_maps"].items():
-        X, y = prepare_data(X_raw, y_raw, label_map)
+
+        #X, y = prepare_data(X_raw, y_raw, label_map)
+
+        # mask for valid labels
+        valid_mask = np.array([label_map.get(lbl, None) is not None for lbl in y_raw])
+
+        X = X_raw[valid_mask]
+        y = np.array([label_map[lbl] for lbl in y_raw[valid_mask]], dtype=int)
+        subject_filt = np.array(subject)[valid_mask]
+        nb_classes = len(np.unique(y))
+        # LOSO masks
+        train_mask = subject_filt != subject_id
+        test_mask = subject_filt == subject_id
 
         X_train_subj = X[train_mask]
         y_train_subj = y[train_mask]
         X_val_subj = X[test_mask]
         y_val_subj = y[test_mask]
 
-        nb_classes = len(np.unique(y_train_subj))
+        
 
         X_tr, X_te, y_tr, y_te = train_test_split(
             X_train_subj, y_train_subj, test_size=0.3,
