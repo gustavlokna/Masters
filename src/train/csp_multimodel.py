@@ -24,8 +24,8 @@ def load_raw_data(npz_path, config):
     print(f"Loaded RAW data: X={X.shape}, y={y.shape}")
 
     # if using subset of channels
-    selected = np.array(config["channels"]["top_64"]) - 1
-    X = X[:, :, selected]
+    #selected = np.array(config["channels"]["top_64"]) - 1
+    #X = X[:, :, selected]
 
     # reshape to (samples, channels, time, 1)
     X = np.expand_dims(X, axis=-1)
@@ -67,7 +67,8 @@ def get_model(model_type, num_classes):
 def test_csp_models_raw(config, file_path, n_csp_components=256):
     X_raw, y_raw, subject, sex, age = load_raw_data(file_path, config)
     all_results = []
-    model_types = ["SVC", "LogisticRegression", "RandomForest", "XGBoost"]
+    # ["SVC", "LogisticRegression", "RandomForest", "XGBoost"]
+    model_types = ["SVC", "XGBoost"]
 
     for map_name, label_map in config["label_maps"].items():
         print(f"\n=== Label map: {map_name} ===")
@@ -103,6 +104,7 @@ def test_csp_models_raw(config, file_path, n_csp_components=256):
             print(classification_report(y_test, base_preds, zero_division=0))
 
             subj_results = []
+            """
             for subj in subjects:
                 train_mask = np.array([subj not in str(s) for s in subj_filtered])
                 test_mask = np.array([str(s) == str(subj) for s in subj_filtered])
@@ -177,7 +179,15 @@ def test_csp_models_raw(config, file_path, n_csp_components=256):
                 "excluded_recall": subj_df["excluded_recall"].mean(),
                 "excluded_kappa": subj_df["excluded_kappa"].mean(),
             }
-
+            """
+            avg_row = {
+            "model_type": model_type,
+            "label_map": map_name,
+            "subject": "average",
+            "baseline_acc": base_acc,
+            "baseline_recall": base_recall,
+            "baseline_kappa": base_kappa,
+            }
             all_results.extend(subj_results)
             all_results.append(avg_row)
 
