@@ -4,7 +4,7 @@ from train.csp_single_subject import test_csp_models_subject
 
 def main(args):
     config = read_config()
-    test_csp_models_subject(config, "Data/processed/segmented_10s_epoch_256hz.npz" ,args.subject_id)
+    test_csp_models_subject(config, "Data/processed/segmented_15s_epoch_256hz.npz" ,args.subject_id)
 
 def parse_arguments():
     p = argparse.ArgumentParser()
