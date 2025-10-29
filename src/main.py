@@ -11,7 +11,7 @@ from train.deepConv import test_deep_conv
 from train.svc import SVC_tetsing
 from train.csp_multimodel import test_csp_models_raw
 from datapreprocessing.imf_permutations import create_imf_combinations
-from train.csp_raw import csp_testing
+
 def main(args: argparse.Namespace) -> None:
     """
     Main function for the ML Piple
