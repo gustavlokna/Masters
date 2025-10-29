@@ -104,7 +104,7 @@ def test_csp_models_raw(config, file_path, n_csp_components=256):
             print(classification_report(y_test, base_preds, zero_division=0))
 
             subj_results = []
-            """
+            
             for subj in subjects:
                 train_mask = np.array([subj not in str(s) for s in subj_filtered])
                 test_mask = np.array([str(s) == str(subj) for s in subj_filtered])
@@ -179,15 +179,7 @@ def test_csp_models_raw(config, file_path, n_csp_components=256):
                 "excluded_recall": subj_df["excluded_recall"].mean(),
                 "excluded_kappa": subj_df["excluded_kappa"].mean(),
             }
-            """
-            avg_row = {
-            "model_type": model_type,
-            "label_map": map_name,
-            "subject": "average",
-            "baseline_acc": base_acc,
-            "baseline_recall": base_recall,
-            "baseline_kappa": base_kappa,
-            }
+            
             all_results.extend(subj_results)
             all_results.append(avg_row)
 
