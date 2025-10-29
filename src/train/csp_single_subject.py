@@ -130,7 +130,8 @@ def test_csp_models_subject(config, file_path, subject_id, n_csp_components=256)
             }
             all_results.append(res)
 
-    out_dir = "model_eval/csp/splitted"
+    input_name = os.path.splitext(os.path.basename(file_path))[0]
+    out_dir = f"model_eval/csp/splitted/{input_name}"
     os.makedirs(out_dir, exist_ok=True)
     out_path = os.path.join(out_dir, f"csp_eval_{subject_id}.csv")
     pd.DataFrame(all_results).to_csv(out_path, index=False)
