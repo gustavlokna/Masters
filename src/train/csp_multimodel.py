@@ -184,6 +184,6 @@ def test_csp_models_raw(config, file_path, n_csp_components=256):
             all_results.append(avg_row)
 
     input_name = os.path.splitext(os.path.basename(file_path))[0]
-    output_path = f"model_eval/csp/csp_{input_name}_with_n_csp_components_{n_csp_components}.xlsx"
+    output_path = f"model_eval/csp/csp_loso_{input_name}_with_n_csp_components_{n_csp_components}.xlsx"
     pd.DataFrame(all_results).to_excel(output_path, index=False)
     print(f"\nResults saved to {output_path}")
