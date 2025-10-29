@@ -34,8 +34,8 @@ def load_raw_data(npz_path, config):
 
     print(f"Loaded RAW data: X={X.shape}, y={y.shape}")
 
-    selected = np.array(config["channels"]["top_64"]) - 1
-    X = X[:, :, selected]
+    #selected = np.array(config["channels"]["top_64"]) - 1
+    #X = X[:, :, selected]
     X = np.transpose(X, (0, 2, 1))
     X = np.expand_dims(X, axis=-1)
 
@@ -201,7 +201,7 @@ def test_deep_conv(config, file_path):
     all_results.append(avg_row)
     # name output file after input npz
     input_name = os.path.splitext(os.path.basename(file_path))[0]
-    output_path = f"model_eval/deep_conv_{input_name}_loaded.xlsx"
+    output_path = f"model_eval/deep_conv_all_chans_{input_name}_loaded.xlsx"
 
     df_results = pd.DataFrame(all_results)
     df_results.to_excel(output_path, index=False)
