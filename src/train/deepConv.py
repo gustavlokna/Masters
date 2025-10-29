@@ -35,8 +35,8 @@ def load_raw_data(npz_path, config):
     print(f"Loaded RAW data: X={X.shape}, y={y.shape}")
 
     selected = np.array(config["channels"]["top_64"]) - 1
-    X = X[:, :, selected]
-    X = np.transpose(X, (0, 2, 1))
+    #X = X[:, :, selected]
+    #X = np.transpose(X, (0, 2, 1))
     X = np.expand_dims(X, axis=-1)
 
     return X, y, subject, sex, age
@@ -70,7 +70,7 @@ def train_deep_eegnet(X_train, y_train, nb_classes):
     samples = X_train.shape[2]
     model = DeepConvNet(nb_classes=nb_classes, Chans=chans, Samples=samples, dropoutRate=0.1)
     model.compile(loss='categorical_crossentropy', optimizer=Adam(learning_rate=1e-3), metrics=['accuracy'])
-    model.fit(X_train, y_train, epochs=100, batch_size=64, verbose=1) #epochs was 100?
+    model.fit(X_train, y_train, epochs=50, batch_size=64, verbose=1) #epochs was 100?
     return model
 
 
@@ -201,7 +201,7 @@ def test_deep_conv(config, file_path):
     all_results.append(avg_row)
     # name output file after input npz
     input_name = os.path.splitext(os.path.basename(file_path))[0]
-    output_path = f"model_eval/deep_conv_all_chans_{input_name}_loaded.xlsx"
+    output_path = f"model_eval/deep_conv_all__50_epochs_chans_{input_name}_loaded.xlsx"
 
     df_results = pd.DataFrame(all_results)
     df_results.to_excel(output_path, index=False)
