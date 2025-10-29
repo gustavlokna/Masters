@@ -97,7 +97,7 @@ def test_deep_conv(config, file_path):
     X_train, X_test, y_train, y_test = train_test_split(
         X, y_cat, test_size=0.3, stratify=y, random_state=42
     )
-    X_train, y_train = balance_classes(X_train, y_train)
+    #X_train, y_train = balance_classes(X_train, y_train)
     # Z-normalization (no data leakage)
     scaler = StandardScaler()
     nsamp, nch, ntime, _ = X_train.shape
