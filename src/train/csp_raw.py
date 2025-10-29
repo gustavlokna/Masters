@@ -88,7 +88,7 @@ def evaluate_model(model, X_test, y_test):
 
 
 
-def csp_testing(config, file_path):
+def csp_testing(config, file_path,n_csp_components = 64):
     X_raw, y_raw, subject, sex, age = load_raw_data(file_path, config)
 
     all_results = []
@@ -106,7 +106,7 @@ def csp_testing(config, file_path):
         X_csp_input = X.squeeze(-1)
         X_csp_input = X_csp_input.transpose(0, 2, 1)  # to (samples, time, channels)
 
-        n_csp_components = 64 
+        
         csp = CSP(n_components=n_csp_components, log=True)
         X_csp = csp.fit_transform(X_csp_input, y)
 
@@ -129,7 +129,7 @@ def csp_testing(config, file_path):
         print("=== Training baseline ===")
         model = train_deep_eegnet(X_train_scaled, y_train, nb_classes)
         base_acc, base_recall, base_kappa = evaluate_model(model, X_test_scaled, y_test)
-
+        """
         subj_results = []
         for subj in np.unique(subjects):
             train_mask = np.array([subj not in str(s) for s in subj_filtered])
@@ -206,9 +206,18 @@ def csp_testing(config, file_path):
         }
 
         all_results.extend(subj_results)
+        """
+        avg_row = {
+            "model_type": "DeepConvNet+CSP",
+            "label_map": map_name,
+            "subject": "average",
+            "baseline_acc": base_acc,
+            "baseline_recall": base_recall,
+            "baseline_kappa": base_kappa,
+        }
         all_results.append(avg_row)
 
     input_name = os.path.splitext(os.path.basename(file_path))[0]
-    output_path = f"model_eval/loso_eval_{input_name}_with_csp.xlsx"
+    output_path = f"model_eval/csp/csp_deep_conv_{input_name}_with_n_csp_components_{n_csp_components}.xlsx"
     pd.DataFrame(all_results).to_excel(output_path, index=False)
     print(f"\nResults saved to {output_path}")

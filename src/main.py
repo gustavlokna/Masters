@@ -11,6 +11,7 @@ from train.deepConv import test_deep_conv
 from train.svc import SVC_tetsing
 from train.csp_multimodel import test_csp_models_raw
 from datapreprocessing.imf_permutations import create_imf_combinations
+from train.csp_raw import csp_testing
 def main(args: argparse.Namespace) -> None:
     """
     Main function for the ML Piple
@@ -63,7 +64,7 @@ def main(args: argparse.Namespace) -> None:
         
     elif args.dev: 
         print("development mode")
-        test_deep_conv(config, "Data/processed/segmented_2.5s_epoch_256hz.npz")
+        csp_testing(config, "Data/processed/segmented_2.5s_epoch_256hz.npz")
         #test_csp_models_raw(config, "Data/processed/segmented_2.5s_epoch_256hz.npz")
     else:
         print("No valid arguments provided. Use --help for usage information.")

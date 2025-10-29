@@ -64,7 +64,7 @@ def get_model(model_type, num_classes):
         raise ValueError(f"Unknown model type: {model_type}")
 
 
-def test_csp_models_raw(config, file_path, n_csp_components=64):
+def test_csp_models_raw(config, file_path, n_csp_components=256):
     X_raw, y_raw, subject, sex, age = load_raw_data(file_path, config)
     all_results = []
     model_types = ["SVC", "LogisticRegression", "RandomForest", "XGBoost"]
@@ -182,6 +182,6 @@ def test_csp_models_raw(config, file_path, n_csp_components=64):
             all_results.append(avg_row)
 
     input_name = os.path.splitext(os.path.basename(file_path))[0]
-    output_path = f"model_eval/csp/sk_models_loso_eval_{input_name}.xlsx"
+    output_path = f"model_eval/csp/sk_models_loso_eval_{input_name}_n_components_{n_csp_components}.xlsx"
     pd.DataFrame(all_results).to_excel(output_path, index=False)
     print(f"\nResults saved to {output_path}")
