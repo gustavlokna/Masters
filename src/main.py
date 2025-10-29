@@ -64,7 +64,7 @@ def main(args: argparse.Namespace) -> None:
         
     elif args.dev: 
         print("development mode")
-        test_csp_models_raw(config, "Data/processed/segmented_2.5s_epoch_256hz.npz")
+        test_deep_conv(config, "Data/processed/segmented_2.5s_epoch_256hz.npz")
     else:
         print("No valid arguments provided. Use --help for usage information.")
 

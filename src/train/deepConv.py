@@ -115,7 +115,7 @@ def test_deep_conv(config, file_path):
     model = train_deep_eegnet(X_train, y_train, nb_classes)
     base_acc, base_recall, base_kappa = evaluate_model(model, X_test, y_test)
     print(f"Baseline -> Acc: {base_acc:.4f}, Recall: {base_recall:.4f}, Kappa: {base_kappa:.4f}")
-    """
+    
     subjects = np.unique(subject)
     subj_results = []
     for subj in subjects:
@@ -190,13 +190,6 @@ def test_deep_conv(config, file_path):
 
     all_results.extend(subj_results)
     all_results.append(avg_row)
-    """
-    avg_row = {
-        "subject": "average",
-        "baseline_acc": base_acc,
-        "baseline_recall": base_recall,
-        "baseline_kappa": base_kappa,
-    }
 
     all_results.append(avg_row)
     # name output file after input npz
