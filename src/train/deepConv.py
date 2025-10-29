@@ -70,7 +70,7 @@ def train_deep_eegnet(X_train, y_train, nb_classes):
     samples = X_train.shape[2]
     model = DeepConvNet(nb_classes=nb_classes, Chans=chans, Samples=samples, dropoutRate=0.1)
     model.compile(loss='categorical_crossentropy', optimizer=Adam(learning_rate=1e-3), metrics=['accuracy'])
-    model.fit(X_train, y_train, epochs=50, batch_size=64, verbose=1) #epochs was 100?
+    model.fit(X_train, y_train, epochs=100, batch_size=64, verbose=1) #epochs was 100?
     return model
 
 
