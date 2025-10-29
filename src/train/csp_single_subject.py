@@ -63,7 +63,7 @@ def get_model(model_type, num_classes):
     else:
         raise ValueError(f"Unknown model type: {model_type}")
 
-def test_csp_models_subject(config, subject_id, n_csp_components=256):
+def test_csp_models_subject(config, file_path ,subject_id, n_csp_components=256):
     file_path = config["data"]["raw"]
     X_raw, y_raw, subject, sex, age = load_raw_data(file_path, config)
 
