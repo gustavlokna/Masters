@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --account=share-ie-idi
-#SBATCH --job-name=csp_deepconv_multilbel    # ✅ Job name  
+#SBATCH --job-name=test_deep_conv    # ✅ Job name  
 #SBATCH --time=240:00:00
 
 #SBATCH --partition=GPUQ
