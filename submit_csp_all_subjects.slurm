@@ -23,8 +23,8 @@ sbatch <<EOF
 #SBATCH --time=72:00:00
 #SBATCH --partition=GPUQ
 #SBATCH --mem=120G
-#SBATCH --output=logs/Kmeans_csp${subj}_out.txt
-#SBATCH --error=logs/Kmeans_csp${subj}_err.txt
+#SBATCH --output=logs/csp${subj}_out.txt
+#SBATCH --error=logs/csp${subj}_err.txt
 
 module purge
 module load Anaconda3/2023.09-0
