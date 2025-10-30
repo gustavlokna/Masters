@@ -55,7 +55,7 @@ def train_model(model_type, X_train, y_train):
         return "MLP", scaler  # Placeholder (handled separately)
 
     elif model_type == "KNN":
-        model = KNeighborsClassifier(n_neighbors=10) #was 5
+        model = KNeighborsClassifier(n_neighbors=5) #was 5
 
     elif model_type == "SVC":
         model = SVC(kernel='rbf', probability=True)

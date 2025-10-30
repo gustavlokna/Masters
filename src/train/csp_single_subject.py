@@ -47,7 +47,7 @@ def get_model(model_type, num_classes):
     elif model_type == "RandomForest":
         return RandomForestClassifier(n_estimators=1000, random_state=42)
     elif model_type == "KNN":
-        return KNeighborsClassifier(n_neighbors=10)
+        return KNeighborsClassifier(n_neighbors=5)
     elif model_type == "XGBoost":
         return XGBClassifier(
             n_estimators=1000,
@@ -66,7 +66,7 @@ def get_model(model_type, num_classes):
 def test_csp_models_subject(config, file_path, subject_id, n_csp_components=64):
     X_raw, y_raw, subject, sex, age = load_raw_data(file_path, config)
 
-    model_types = ["SVC", "XGBoost"]
+    model_types = ["SVC", "XGBoost", "KNN"]
     all_results = []
 
     for map_name, label_map in config["label_maps"].items():
