@@ -5,21 +5,41 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score, recall_score, cohen_kappa_score, classification_report
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.optimizers import Adam
-from utilities.EEGNet import DeepConvNet
+from utilities.deepConv_pytorch import DeepConvNet
 import os
 
+import torch
+import torch.nn.functional as F
+from torch.utils.data import TensorDataset, DataLoader
 
 def train_deep_eegnet(X_train, y_train, nb_classes):
-    chans = X_train.shape[1]
-    samples = X_train.shape[2]
-    model = DeepConvNet(nb_classes=nb_classes, Chans=chans, Samples=samples, dropoutRate=0.1)
-    model.compile(loss="categorical_crossentropy", optimizer=Adam(1e-3), metrics=["accuracy"])
-    model.fit(X_train, y_train, epochs=100, batch_size=64, verbose=1)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    chans, samples = X_train.shape[1], X_train.shape[2]
+    model = DeepConvNet(nb_classes, Chans=chans, Samples=samples, dropoutRate=0.1).to(device)
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+    criterion = torch.nn.CrossEntropyLoss()
+
+    X_train_t = torch.tensor(X_train, dtype=torch.float32).to(device)
+    y_train_t = torch.tensor(np.argmax(y_train, axis=1), dtype=torch.long).to(device)
+    loader = DataLoader(TensorDataset(X_train_t, y_train_t), batch_size=64, shuffle=True)
+
+    model.train()
+    for _ in range(100):
+        for xb, yb in loader:
+            optimizer.zero_grad()
+            out = model(xb)
+            loss = criterion(out, yb)
+            loss.backward()
+            optimizer.step()
     return model
 
 
 def evaluate_model(model, X_test, y_test):
-    preds = model.predict(X_test, verbose=0)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model.eval()
+    X_test_t = torch.tensor(X_test, dtype=torch.float32).to(device)
+    with torch.no_grad():
+        preds = model(X_test_t).cpu().numpy()
     y_pred = np.argmax(preds, axis=1)
     y_true = np.argmax(y_test, axis=1)
     acc = accuracy_score(y_true, y_pred)
@@ -27,6 +47,8 @@ def evaluate_model(model, X_test, y_test):
     kappa = cohen_kappa_score(y_true, y_pred)
     print(classification_report(y_true, y_pred, zero_division=0))
     return acc, recall, kappa
+
+
 
 
 def test_deep_conv_subject(config, data_tuple, subject_id):
