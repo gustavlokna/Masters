@@ -35,7 +35,8 @@ def apply_eemd_filter(X):
 
 def apply_eemd_single_band_pipeline(config: dict, subject_id: str) -> None:
     input_path = config["data"]["preprocessed_no_bp"]
-    base_output_dir = config["data"]["eemd_single_band"]
+    base_output_dir = "Data/eemd"
+    os.makedirs(base_output_dir, exist_ok=True)
 
     # Load data
     X, y, subject, sex, age = load_data(input_path)
