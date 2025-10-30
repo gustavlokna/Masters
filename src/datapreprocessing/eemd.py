@@ -13,14 +13,22 @@ def save_filtered_data(output_path, X_filtered, y, subject, sex, age):
 
 
 def eemd_filter_segment(segment):
-    segment_T = segment.T  # (channels, samples)
     eemd = EEMD()
     eemd.trials = 50
     eemd.max_imf = 5
-    imfs = eemd.eemd(segment_T)  # returns list of IMFs per channel
-    imfs = imfs[:5]  # first 5 IMFs
-    imfs_concat = np.concatenate(imfs, axis=1)  # concatenate along time
-    return imfs_concat.T  # (samples_concat, channels)
+
+    channels = segment.shape[1]
+    imfs_per_channel = []
+
+    for ch in range(channels):
+        sig = segment[:, ch]
+        imfs = eemd.eemd(sig)
+        imfs = imfs[:5]  # first 5 IMFs
+        imfs_concat = np.concatenate(imfs)
+        imfs_per_channel.append(imfs_concat[:len(sig)])  # trim to original length
+
+    return np.stack(imfs_per_channel, axis=1)  # (samples, channels)
+
 
 
 def apply_eemd_filter(X):
