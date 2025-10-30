@@ -1,6 +1,6 @@
 import argparse
 from utilities.config import read_config
-from train.csp_single_subject import test_csp_models_subject
+from train.Unsupervised import test_csp_models_subject
 
 def main(args):
     config = read_config()
