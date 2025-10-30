@@ -1,10 +1,10 @@
 import argparse
 from utilities.config import read_config
-from train.Unsupervised import test_csp_models_subject
+from train.csp_single_subject import test_csp_models_subjectubject
 
 def main(args):
     config = read_config()
-    test_csp_models_subject(config, "Data/processed/segmented_25s_epoch_256hz.npz" ,args.subject_id)
+    test_csp_models_subjectubject(config, "Data/processed/segmented_25s_epoch_256hz.npz" ,args.subject_id)
 
 def parse_arguments():
     p = argparse.ArgumentParser()
