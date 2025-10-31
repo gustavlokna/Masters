@@ -1,14 +1,14 @@
 #!/bin/bash
 #SBATCH --account=share-ie-idi
-#SBATCH --job-name=test_csp_models_raw    # ✅ Job name  
+#SBATCH --job-name=ploting    # ✅ Job name  
 #SBATCH --time=240:00:00
 
 #SBATCH --partition=GPUQ
 #SBATCH --gres=gpu:1
 #SBATCH --mem=600G
 #SBATCH --nodes=1
-#SBATCH --output=logs/test_csp_models_raw_out.txt         # ✅ Output file
-#SBATCH --error=logs/test_csp_models_raw_err.txt          # ✅ Error file
+#SBATCH --output=logs/ploting_out.txt         # ✅ Output file
+#SBATCH --error=logs/ploting_err.txt          # ✅ Error file
 
 #SBATCH --mail-user=gustal@stud.ntnu.no
 #SBATCH --mail-type=ALL
