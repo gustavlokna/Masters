@@ -11,6 +11,7 @@ from train.deepConv import test_deep_conv
 from train.svc import SVC_tetsing
 from train.csp_multimodel import test_csp_models_raw
 from datapreprocessing.imf_permutations import create_imf_combinations
+from exploration.exploration import run_subjectwise_band_corr
 
 def main(args: argparse.Namespace) -> None:
     """
@@ -64,7 +65,8 @@ def main(args: argparse.Namespace) -> None:
         
     elif args.dev: 
         print("development mode")
-        test_csp_models_raw(config, "Data/processed/segmented_2.5s_epoch_256hz.npz")
+        #test_csp_models_raw(config, "Data/processed/segmented_2.5s_epoch_256hz.npz")
+        run_subjectwise_band_corr("Data/psd/Psd_segmented_2s_epoch_256hz.npz", "Data/exploration/band_correlation/")
     else:
         print("No valid arguments provided. Use --help for usage information.")
 

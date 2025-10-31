@@ -9,3 +9,5 @@ openpyxl
 xgboost
 tensorflow
 PyEMD
+matplotlib
+seaborn
